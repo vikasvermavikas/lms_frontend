@@ -11,9 +11,10 @@ const secretKey = 'secretkey';
 const hello_controller = require('./controllers/helloController');
 const userController = require('./controllers/userController');
 const auth = require('./controllers/authController');
+const booksController = require('./controllers/bookController');
 
 const app = express();
-app.use(session({secret: 'Your_Secret_Key', resave: false, saveUninitialized: true}));
+app.use(session({ secret: 'Your_Secret_Key', resave: false, saveUninitialized: true }));
 
 // Prevent XSS vulnerabilities.
 app.use(cors());
@@ -52,14 +53,24 @@ function verifytoken(req, res, next) {
     }
 };
 
+// ************** Define Routes **************
+
+// ************** Manage Books **************
+// Add Book.
+app.post('/books/create', verifytoken, booksController.add_book);
+app.get('/books/read/:search?', verifytoken, booksController.read_book);
+app.get('/books/edit/:id', verifytoken, booksController.get_book);
+app.put('/books/update/:id', verifytoken, booksController.update_book);
+app.delete('/books/delete/:id', verifytoken, booksController.delete_book);
+app.post('/books/assign/', verifytoken, booksController.assign_book);
+app.get('/books/assignments/:search?', verifytoken, booksController.get_book_assignments);
+app.get('/books/assignment_detail/:id', verifytoken, booksController.get_assignment_detail);
+
+// ************** Manage Users **************
+
+
 // Get Routes
 app.get("/", hello_controller);
-
-// Get Users.
-app.get('/users', verifytoken, userController.userlist);
-
-// Insert Users.
-app.post('/users', userController.add_user);
 
 // Do registration.
 app.post('/signup', upload.single('image'), auth.usersignup);
@@ -70,30 +81,28 @@ app.post('/login', auth.login);
 // Do Logout.
 app.post('/logout', auth.logout);
 
+
+
+// ************** Manage Users **************
+// Get Users.
+app.get('/users', verifytoken, userController.userlist);
+
+// Insert Users.
+app.post('/users', verifytoken, userController.add_user);
+
 // Read user.
 app.get('/read/:id', verifytoken, userController.userdata);
 
 // Update user.
-app.put('/update/:id', verifytoken , userController.update_user);
+app.put('/update/:id', verifytoken, userController.update_user);
 
 // Delete user.
-app.delete('/delete/:id', verifytoken , userController.delete_user)
+app.delete('/delete/:id', verifytoken, userController.delete_user)
 
 // Search user.
 app.get('/user', verifytoken, userController.search);
+// ************** End Manage users ************
 
-// app.get('/createsession', (req, res) => {
-//     req.session.userName = 'Sessions successfully';
-//     res.send('Session set successfully');
-// });
-// app.get('/testsession', (req, res) => {
-    
-//     if(req.session.userName) {
-//         res.send(req.session.userName);
-//     } else {
-//         res.send('No session');
-//     }
-// });
 // Listen for changes.
 app.listen(8082, () => {
     console.log('Server is running on port 8082');

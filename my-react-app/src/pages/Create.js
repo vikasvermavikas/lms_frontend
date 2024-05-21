@@ -3,30 +3,49 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
 const Create = () => {
+    const token = localStorage.getItem("TOKEN");
+    const [error, setError] = useState({
+        server: ''
+    });
     const [values, setValues] = useState({
         username: '',
         first_name: '',
         last_name: '',
         email: '',
-        gender: ''
+        gender: '',
+        mobile: 0,
+        aadhar: 0,
     });
 
     useEffect(() => {
         document.title = "Create User";
     }, []);
     const navigate = useNavigate();
-
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${token}`
+        }
+    };
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:8082/users', values)
+        axios.post('http://localhost:8082/users', values, config)
             .then(res => {
-                navigate('/user/users');
+                if (res.data.errno) {
+                    setError({
+                        server: res.data.sqlMessage
+                    });
+                }
+                else {
+                    navigate('/user/users');
+                }
             })
             .catch(err => console.log(err));
     }
     return (
         <div className="d-flex vh-90 justify-content-center align-items-center">
             <div className="w-50 bg-white rounded p-3">
+                {error.server ? (<span className='text-danger'>* {error.server}</span>) : ''}
                 <form onSubmit={handleSubmit}>
                     <h2>Add User</h2>
                     <div className="mb-2">
@@ -44,6 +63,14 @@ const Create = () => {
                     <div className="mb-2">
                         <label htmlFor="email">Email</label>
                         <input type="email" className="form-control" name="email" placeholder='Enter Email' onChange={e => setValues({ ...values, email: e.target.value })} required />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="mobile">Mobile No.</label>
+                        <input type="text" maxLength="10" className="form-control" name="mobile" pattern="[7-9]{1}[0-9]{9}" placeholder='Enter Mobile No.' onChange={e => setValues({ ...values, mobile: e.target.value })} required />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="aadhar">Aadhar Card No.</label>
+                        <input type="text" maxLength="12" className="form-control" name="aadhar" pattern="[4-9]{1}[0-9]{11}" placeholder='Enter Aadhar Card No.' onChange={e => setValues({ ...values, aadhar: e.target.value })} />
                     </div>
                     <div className="mb-2">
                         <label htmlFor="gender">Gender</label>
