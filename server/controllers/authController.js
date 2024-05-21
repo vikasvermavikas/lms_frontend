@@ -25,7 +25,7 @@ const login = (req, res) => {
                             username: userdata.username,
                             email: userdata.email,
                         }, secretKey, {
-                            expiresIn: 60
+                            expiresIn: '1h'
                         }, (err, token) => {
                             return res.json({
                                 status: true,
