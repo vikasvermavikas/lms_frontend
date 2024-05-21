@@ -1,4 +1,8 @@
 /my-react-app/node_modules/
 /server/node_modules/
 /server/database.js
-
+/server/package.json
+/server/package-lock.json
+/my-react-app/package.json
+/my-react-app/package-lock.json
+.gitignore

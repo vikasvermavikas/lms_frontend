@@ -6,16 +6,26 @@ var Users = function (users) {
     this.last_name = users.last_name;
     this.email = users.email;
     this.gender = users.gender;
+    this.mobile = users.mobile;
+    this.aadhar = users.aadhar;
+    this.status = 1;
+    this.timecreated = Math.floor(Date.now() / 1000);
+    this.timeupdated = Math.floor(Date.now() / 1000);
 };
 
 Users.create = (data, cb) => {
-    const sql = 'INSERT INTO users (username, first_name, last_name, email, gender) VALUES (?)';
+    const sql = 'INSERT INTO users (username, first_name, last_name, email, gender, mobile, aadhar, status,timecreated, timeupdated) VALUES (?)';
     const values = [
         data.username,
         data.first_name,
         data.last_name,
         data.email,
-        data.gender
+        data.gender,
+        data.mobile,
+        data.aadhar,
+        data.status,
+        data.timecreated,
+        data.timeupdated,
     ];
     connection.query(sql, [values], (err, result) => {
         if (err) {
@@ -43,9 +53,10 @@ Users.findById = (id, cb) => {
     });
 };
 Users.update = (data, id, cb) => {
-    const sql = 'UPDATE users SET `first_name` = ?, `last_name` = ?, `email` = ? , `gender` = ? WHERE id =?';
+    const sql = 'UPDATE users SET `first_name` = ?, `last_name` = ?, `email` = ? , `gender` = ?, `mobile` = ?, `aadhar` = ? WHERE id =?';
 
-    connection.query(sql, [data.first_name, data.last_name, data.email, data.gender, id], (err, result) => {
+    connection.query(sql, [data.first_name, data.last_name, data.email, data.gender, data.mobile,
+        data.aadhar, id], (err, result) => {
         if (err) {
             cb(err, null);
         }

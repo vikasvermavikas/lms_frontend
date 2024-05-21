@@ -22,6 +22,16 @@ const Users = () => {
         setSearch('');
         axios.get("http://localhost:8082/users", config)
             .then(res => {
+                if (res.data.length == 0) {
+                    setError({
+                        search: 'No Data Found'
+                    });
+                }
+                else{
+                    setError({
+                        search: ''
+                    });
+                }
                 setData(res.data);
                 setError({
                     list: ''
