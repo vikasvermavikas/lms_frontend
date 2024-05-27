@@ -3,7 +3,6 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'nodemysql'
+    database: 'node_mvc'
 })
-
 module.exports = db;

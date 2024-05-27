@@ -155,7 +155,20 @@ class books {
     };
 
 
-
+    static return_book = (id, cb) => {
+        const sql = 'UPDATE book_assignments SET `return` = ? WHERE id = ?'; 
+        const values = [
+            1,
+            id
+        ];
+        connection.query(sql, values, (err,result) => {
+            if(err){
+                cb(err,null);
+            }else{
+                cb(null,result);
+            }
+        });
+    } 
 }
 
 module.exports = books;

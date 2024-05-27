@@ -103,16 +103,16 @@ const Books = () => {
 
                 {/* Table */}
                 <div className="table-responsive">
-                    <table className="table">
+                    <table className="table text-center">
                         <thead>
                             <tr>
-                                <th className='text-center'>Id</th>
-                                <th className='text-center'>Serial Number</th>
-                                <th className='text-center'>Book Name</th>
-                                <th className='text-center'>Publisher Name</th>
-                                <th className='text-center'>Class</th>
-                                <th className='text-center'>Publish Year</th>
-                                <th className='text-center'>Action</th>
+                                <th>Id</th>
+                                <th>Serial Number</th>
+                                <th>Book Name</th>
+                                <th>Publisher Name</th>
+                                <th>Class</th>
+                                <th>Publish Year</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const BookAssignment = () => {
@@ -16,6 +16,33 @@ const BookAssignment = () => {
             'authorization': `Bearer ${token}`,
         }
     };
+
+
+// return book
+
+const returnBook = (id) => {
+const data = {"return" : 1};
+    axios.put('http://localhost:8082/books/bookreturn/' + id, data, config)
+    .then(res => {
+    //    setValues(res.data[0]);
+       console.log(res.data[0]);
+
+       setError({
+           server: ''
+       });
+    })
+    .catch(err => {
+        setError({
+            server: err.response.data
+        });
+    })
+};
+
+
+
+
+
+
     const handleInput = (e) => {
         setValues({ ...values, [e.target.name]: e.target.value });
     };
@@ -50,7 +77,7 @@ const BookAssignment = () => {
         e.preventDefault();
         setValues({...values, search: '' });
         setError({...error, search: '' });
-        getUserAssignments();
+        
     };
     return (
         <div className="container-fluid vh-100">
@@ -99,7 +126,8 @@ const BookAssignment = () => {
                                     <td className='text-center'>{new Date(book.from_date).toLocaleDateString()}</td>
                                     <td className='text-center'>{new Date(book.to_date).toLocaleDateString()}</td>
                                     <td className='text-center'>
-                                        <Link to={`/book/assignment_details/${book.id}`} className="btn btn-sm btn-primary">View Details</Link>
+                                        <Link to={`/book/assignment_details/${book.id}`} className="btn btn-sm btn-primary ml-2">View Details</Link>
+                                        <Link onClick={() => returnBook(book.id)} className="btn btn-sm btn-info"> {book.return == 1 ? 'Return' : 'Returned'} </  Link>                                    
                                     </td>
                                 </tr>
                             ))}
