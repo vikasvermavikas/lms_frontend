@@ -1,14 +1,17 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 
 const Books = () => {
     const token = localStorage.getItem('TOKEN');
+    const [nextbutton, setNextbutton] = useState('');
+    const [assignmentStatuses, setAssignmentStatuses] = useState({});
     const [data, setData] = useState([
 
     ]);
     const [search, setSearch] = useState('');
+    const [isassign, setIsassign] = useState('');
     const [error, setError] = useState({
         search: '',
         list: '',
@@ -19,9 +22,7 @@ const Books = () => {
             'authorization': 'Bearer ' + token
         }
     };
-
     const getbookdata = () => {
-        setSearch('');
         axios.get('http://localhost:8082/books/read', config)
             .then(res => {
                 setData(res.data);
@@ -32,11 +33,39 @@ const Books = () => {
                 })
             })
     };
+    const fetchAssignmentStatuses = async (books) => {
+        const statuses = {};
+        const requests = books.map(book =>
+            axios.get(`http://localhost:8082/books/is_assign/${book.id}`, config)
+                .then(res => {
+                    statuses[book.id] = res.data;
+                })
+                .catch(error => {
+                    console.error(`Error fetching assignment status for book ID ${book.id}:`, error);
+                })
+        );
+        await Promise.all(requests);
+        setAssignmentStatuses(statuses);
+    };
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const recordsPerPage = 10;
+    const lastIndex = currentPage * recordsPerPage;
+    const firstIndex = lastIndex - recordsPerPage;
+    const records = data.slice(firstIndex, lastIndex);   // Filter only specific records.
+    const npage = Math.ceil(data.length / recordsPerPage);  // Round off the values.
+    const numbers = [...Array(npage + 1).keys()].slice(1);
+
     useEffect(() => {
         document.title = "Books List";
         getbookdata();
-
     }, []);
+
+    useEffect(() => {
+        if (data.length > 0) {
+            fetchAssignmentStatuses(data);
+        }
+    }, [data]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -47,7 +76,7 @@ const Books = () => {
                         search: 'No Data Found'
                     });
                 }
-                else{
+                else {
                     setError({
                         search: ''
                     });
@@ -66,15 +95,34 @@ const Books = () => {
     };
     const handeDelete = (id) => {
         axios.delete('http://localhost:8082/books/delete/' + id, config)
-           .then(res => {
+            .then(res => {
                 getbookdata();
             })
-           .catch(err => {
+            .catch(err => {
                 setError({
                     list: err.response.data
                 })
             });
     };
+
+    const prePage = () => {
+        if (currentPage !== firstIndex) {
+            setCurrentPage(currentPage - 1);
+        }
+    }
+
+    const nextPage = () => {
+        if (currentPage !== lastIndex) {
+            setCurrentPage(currentPage + 1);
+        }
+        else {
+            setNextbutton('disabled');
+        }
+    }
+
+    const changeCurrentPage = (id) => {
+        setCurrentPage(id);
+    }
 
     return (
         <div className="container-fluid">
@@ -103,20 +151,20 @@ const Books = () => {
 
                 {/* Table */}
                 <div className="table-responsive">
-                    <table className="table">
+                    <table className="table text-center">
                         <thead>
                             <tr>
-                                <th className='text-center'>Id</th>
-                                <th className='text-center'>Serial Number</th>
-                                <th className='text-center'>Book Name</th>
-                                <th className='text-center'>Publisher Name</th>
-                                <th className='text-center'>Class</th>
-                                <th className='text-center'>Publish Year</th>
-                                <th className='text-center'>Action</th>
+                                <th >Id</th>
+                                <th>Serial Number</th>
+                                <th>Book Name</th>
+                                <th>Publisher Name</th>
+                                <th>Class</th>
+                                <th>Publish Year</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {data.map((book, index) => (
+                            {records.map((book, index) => (
                                 <tr key={index}>
                                     <td>{index + 1} </td>
                                     <td>{book.serial_number}</td>
@@ -128,14 +176,33 @@ const Books = () => {
                                         <Link to={`/book/read/${book.id}`} className="btn btn-sm btn-primary">Read</Link>
                                         <Link to={`/book/edit/${book.id}`} className="btn btn-sm btn-info ms-2">Edit</Link>
                                         <button onClick={() => handeDelete(book.id)} className="btn btn-sm btn-danger ms-2">Delete</button>
-                                        <Link to={`/book/assign_book/${book.id}`} className="btn btn-sm btn-warning ms-2">Assign Book</Link>
-
+                                        {assignmentStatuses[book.id] == 'available' ? (<Link to={`/book/assign_book/${book.id}`} className="btn btn-sm btn-warning ms-2">Assign Book</Link>) : (<button className='btn btn-sm btn-warning ms-2 disabled'>Assigned</button>)}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
 
                     </table>
+                    <nav>
+                        <ul className="pagination">
+                            <li className="page-item">
+                                <a href="#" className={`page-link ${currentPage === 1 ? 'disabled' : ''}`}
+                                    onClick={prePage}>Prev</a>
+                            </li>
+                            {
+                                numbers.map((n, i) => (
+                                    <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
+                                        <a href="#" className="page-link" onClick={() => changeCurrentPage(n)}> {n} </a>
+                                    </li>
+                                ))
+                            }
+
+                            <li className="page-item">
+                                <a href="#" className={`page-link ${currentPage === npage ? 'disabled' : ''}`}
+                                    onClick={nextPage}>Next</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>

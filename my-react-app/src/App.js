@@ -52,7 +52,7 @@ function App() {
           <Route index path="register" element={<Register />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<Users />} />
-          <Route path="create" element={<Create />} />
+          <Route path="create" element={<Create title="blogs"/>} />
           <Route path="logout" element={<Logout />} />
           <Route path="read/:id" element={<Read />} />
           <Route path="edit/:id" element={<Edit />} />

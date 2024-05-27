@@ -97,6 +97,18 @@ const get_assignment_detail = (req, res) => {
         }
     })
 };
+
+const is_assign = (req, res) => {
+    const bookid = req.params.id;
+    books.is_assign(bookid, function (err, results) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(results);
+        }
+    })
+};
+
 module.exports = {
     add_book,
     read_book,
@@ -105,5 +117,6 @@ module.exports = {
     delete_book,
     assign_book,
     get_book_assignments,
-    get_assignment_detail
+    get_assignment_detail,
+    is_assign
 };

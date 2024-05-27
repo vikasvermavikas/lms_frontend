@@ -97,7 +97,7 @@ class books {
         data.to_date = (new Date(data.to_date)).getTime();
         data.timecreated = Math.floor(Date.now() / 1000);
         data.timeupdated = Math.floor(Date.now() / 1000);
-        
+
         const values = [
             data.userid,
             data.book_id,
@@ -133,9 +133,9 @@ class books {
             if (err) {
                 cb(err, null);
             }
-            else{
+            else {
 
-                cb(null, result);   
+                cb(null, result);
             }
         });
     };
@@ -147,14 +147,35 @@ class books {
             if (err) {
                 cb(err, null);
             }
-            else{
+            else {
 
-                cb(null, result);   
+                cb(null, result);
             }
         });
     };
 
+    static is_assign = (id, cb) => {
+        const sql = 'SELECT * FROM book_assignments WHERE book_id =?';
+        connection.query(sql, [id], (err, result) => {
+            if (err) {
+                cb(err, null);
+            }
+            else {
+                if (result && result.length > 0) {
+                    if (result[0].return == 0) {
+                        cb(null, 'not available');
+                    }
+                    else {
+                        cb(null, 'available');
+                    }
+                }
+                else {
+                    cb(null, 'available');
+                }
+            }
 
+        })
+    };
 
 }
 

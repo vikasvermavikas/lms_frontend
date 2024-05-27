@@ -27,7 +27,7 @@ const Users = () => {
                         search: 'No Data Found'
                     });
                 }
-                else{
+                else {
                     setError({
                         search: ''
                     });
@@ -82,7 +82,7 @@ const Users = () => {
     }
 
     const [currentPage, setCurrentPage] = useState(1);
-    const recordsPerPage = 2;
+    const recordsPerPage = 10;
     const lastIndex = currentPage * recordsPerPage;
     const firstIndex = lastIndex - recordsPerPage;
     const records = data.slice(firstIndex, lastIndex);
@@ -134,9 +134,9 @@ const Users = () => {
                                     <td>{user.last_name}</td>
                                     <td>{user.email}</td>
                                     <td>
-                                        <Link to={`/user/read/${user.id}`} className="btn btn-sm btn-primary">Read</Link>
-                                        <Link to={`/user/edit/${user.id}`} className="btn btn-sm btn-info">Edit</Link>
-                                        <button onClick={() => handeDelete(user.id)} className="btn btn-sm btn-danger">Delete</button>
+                                        <Link to={`/user/read/${user.id}`} className="btn btn-sm btn-primary ms-2">Read</Link>
+                                        <Link to={`/user/edit/${user.id}`} className="btn btn-sm btn-info ms-2">Edit</Link>
+                                        <button onClick={() => handeDelete(user.id)} className="btn btn-sm btn-danger ms-2">Delete</button>
 
                                     </td>
                                 </tr>
@@ -147,20 +147,20 @@ const Users = () => {
                     <nav>
                         <ul className="pagination">
                             <li className="page-item">
-                                <a href="#" className="page-link"
-                                onClick={prePage}>Prev</a>
+                                <a href="#" className={`page-link ${currentPage === 1 ? 'disabled' : ''}`}
+                                    onClick={prePage}>Prev</a>
                             </li>
                             {
-                                numbers.map((n,i) => (
+                                numbers.map((n, i) => (
                                     <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
-                                        <a href="#" className="page-link" onClick={ () => changeCurrentPage(n)}> {n} </a>
+                                        <a href="#" className="page-link" onClick={() => changeCurrentPage(n)}> {n} </a>
                                     </li>
-                                ))  
+                                ))
                             }
 
                             <li className="page-item">
-                                <a href="#" className="page-link"
-                                onClick={nextPage}>Next</a>
+                                <a href="#" className={`page-link ${currentPage === npage ? 'disabled' : ''}`}
+                                    onClick={nextPage}>Next</a>
                             </li>
                         </ul>
                     </nav>
@@ -169,19 +169,19 @@ const Users = () => {
         </>
     );
 
-    function prePage(){
-        if(currentPage !== firstIndex){
+    function prePage() {
+        if (currentPage !== firstIndex) {
             setCurrentPage(currentPage - 1);
         }
     }
 
-    function nextPage(){
-        if(currentPage !== lastIndex){
-            setCurrentPage( currentPage + 1);
+    function nextPage() {
+        if (currentPage !== lastIndex) {
+            setCurrentPage(currentPage + 1);
         }
     }
-   
-    function changeCurrentPage(id){
+
+    function changeCurrentPage(id) {
         setCurrentPage(id);
     }
 };
