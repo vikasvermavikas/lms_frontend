@@ -1,7 +1,8 @@
 // import logo from './logo.svg';
 // import './App.css';
 import { useState, createContext } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route} from "react-router-dom";
+
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Blogs from "./pages/Blogs";
@@ -27,8 +28,19 @@ import BookAssign from "./books/BookAssign";
 import BookAssignDetail from "./books/BookAssignDetail";
 
 const UserContext = createContext()
-
 function App() {
+
+
+  const token = localStorage.getItem("USER");
+
+  console.log(token);
+
+
+
+
+  if (!localStorage.getItem("USER")) {
+    <Logout />
+  }
 
   const [count, setCount] = useState(0);
   const [todos, setTodos] = useState(["todo 1", "todo 2"]);

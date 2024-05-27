@@ -109,6 +109,19 @@ const is_assign = (req, res) => {
     })
 };
 
+const book_return = (req,res) => {
+    const id = req.params.id;
+    books.return_book(id, function(err, results){
+        if (err) {
+            // res.send(err);
+            console.log(err);
+        } else {
+            // res.send(results);
+            console.log(results);
+        }
+    })
+
+}
 module.exports = {
     add_book,
     read_book,
@@ -118,5 +131,6 @@ module.exports = {
     assign_book,
     get_book_assignments,
     get_assignment_detail,
-    is_assign
+    is_assign,
+    book_return
 };

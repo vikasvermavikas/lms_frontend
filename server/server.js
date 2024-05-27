@@ -66,6 +66,8 @@ app.post('/books/assign/', verifytoken, booksController.assign_book);
 app.get('/books/assignments/:search?', verifytoken, booksController.get_book_assignments);
 app.get('/books/assignment_detail/:id', verifytoken, booksController.get_assignment_detail);
 app.get('/books/is_assign/:id', verifytoken, booksController.is_assign);
+app.put('/books/bookreturn/:id', verifytoken, booksController.book_return);
+
 
 // ************** Manage Users **************
 
