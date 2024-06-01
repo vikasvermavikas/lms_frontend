@@ -1,14 +1,16 @@
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { ReactSession } from "react-client-session";
+// import { ReactSession } from "react-client-session";
 import Footer from './Footer';
 
 const Sidebar = () => {
     const navigate = useNavigate();
+    const [dashboardUrl, setDashboardUrl] = useState('');
     // Default set userdata.
     const [userdata, setUserdata] = useState({
         username: '',
         image: '',
+        roleid: '',
     });
 
     useEffect(() => {
@@ -19,6 +21,12 @@ const Sidebar = () => {
         else {
             // Set userdata.
             setUserdata(JSON.parse(localStorage.getItem("USER")));
+            if (userdata.roleid === 1) {
+                setDashboardUrl('/user/dashboard');
+            }
+            else {
+                setDashboardUrl('/guest/dashboard');
+            }
         }
     }, []);
 
@@ -27,7 +35,7 @@ const Sidebar = () => {
         <>
             <div id="wrapper">
                 <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-                    <Link to="/user/dashboard" className="sidebar-brand d-flex align-items-center justify-content-center">
+                    <Link to={dashboardUrl} className="sidebar-brand d-flex align-items-center justify-content-center">
                         <div className="sidebar-brand-icon rotate-n-15">
                             <i className="fas fa-laugh-wink"></i>
                         </div>
@@ -39,7 +47,7 @@ const Sidebar = () => {
                     {/* <!-- Nav Item - Dashboard --> */}
                     <li className="nav-item active">
 
-                        <Link to="/user/dashboard" className="nav-link"> <i className="fas fa-fw fa-tachometer-alt"></i>
+                        <Link to={dashboardUrl} className="nav-link"> <i className="fas fa-fw fa-tachometer-alt"></i>
                             <span>Dashboard</span> </Link>
                     </li>
 
@@ -50,50 +58,52 @@ const Sidebar = () => {
                     <div className="sidebar-heading">
                         Interface
                     </div>
-
+                    {userdata.roleid === 1 ? (<>
+                        <li className="nav-item">
+                            <a className="nav-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+                                aria-expanded="true" aria-controls="collapseTwo">
+                                <i className="fas fa-fw fa-cog"></i>
+                                <span>Manage Users</span>
+                            </a>
+                            <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                <div className="bg-white py-2 collapse-inner rounded">
+                                    <h6 className="collapse-header">Users:</h6>
+                                    <Link to="/user/users" className="collapse-item">Users List</Link>
+                                    <Link to="/user/create" className="collapse-item">Add User</Link>
+                                </div>
+                            </div>
+                        </li>
+                        <li className="nav-item">
+                            <a className="nav-link collapsed" data-toggle="collapse" data-target="#collapseThree"
+                                aria-expanded="true" aria-controls="collapseThree">
+                                <i className="fas fa-fw fa-cog"></i>
+                                <span>Library Management</span>
+                            </a>
+                            <div id="collapseThree" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                <div className="bg-white py-2 collapse-inner rounded">
+                                    <h6 className="collapse-header">Books:</h6>
+                                    <Link to="/book/books" className="collapse-item">Books List</Link>
+                                    <Link to="/book/create" className="collapse-item">Add Book</Link>
+                                </div>
+                            </div>
+                        </li>
+                        </>) : ''}
                     {/* <!-- Nav Item - Pages Collapse Menu --> */}
-                    <li className="nav-item">
-                        <a className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                            aria-expanded="true" aria-controls="collapseTwo">
-                            <i className="fas fa-fw fa-cog"></i>
-                            <span>Manage Users</span>
-                        </a>
-                        <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                            <div className="bg-white py-2 collapse-inner rounded">
-                                <h6 className="collapse-header">Users:</h6>
-                                <Link to="/user/users" className="collapse-item">Users List</Link>
-                                <Link to="/user/create" className="collapse-item">Add User</Link>
-                            </div>
-                        </div>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
-                            aria-expanded="true" aria-controls="collapseThree">
-                            <i className="fas fa-fw fa-cog"></i>
-                            <span>Library Management</span>
-                        </a>
-                        <div id="collapseThree" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                            <div className="bg-white py-2 collapse-inner rounded">
-                                <h6 className="collapse-header">Books:</h6>
-                                <Link to="/book/books" className="collapse-item">Books List</Link>
-                                <Link to="/book/create" className="collapse-item">Add Book</Link>
-                            </div>
-                        </div>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour"
-                            aria-expanded="true" aria-controls="collapseFour">
-                            <i className="fas fa-fw fa-cog"></i>
-                            <span>Assign Books</span>
-                        </a>
-                        <div id="collapseFour" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                            <div className="bg-white py-2 collapse-inner rounded">
-                                <h6 className="collapse-header">Books Assignment:</h6>
-                                <Link to="/book/assignments" className="collapse-item">Assignments</Link>
-                            </div>
-                        </div>
-                    </li>
 
+                    <li className="nav-item">
+                            <a className="nav-link collapsed" data-toggle="collapse" data-target="#collapseFour"
+                                aria-expanded="true" aria-controls="collapseFour">
+                                <i className="fas fa-fw fa-cog"></i>
+                                <span>Assign Books</span>
+                            </a>
+                            <div id="collapseFour" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                <div className="bg-white py-2 collapse-inner rounded">
+                                    <h6 className="collapse-header">Books</h6>
+                                    <Link to={userdata.roleid === 1 ? '/book/assignments' : '/guest/assignments'} className="collapse-item">Assignments</Link>
+                                    <Link to="/book/stock" className="collapse-item">Stock</Link>
+                                </div>
+                            </div>
+                        </li>
                 </ul>
 
 
@@ -108,7 +118,7 @@ const Sidebar = () => {
                             </button>
 
                             {/* <!-- Topbar Search --> */}
-                            <form
+                            {/* <form
                                 className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                                 <div className="input-group">
                                     <input type="text" className="form-control bg-light border-0 small" placeholder="Search for..."
@@ -119,14 +129,14 @@ const Sidebar = () => {
                                         </button>
                                     </div>
                                 </div>
-                            </form>
+                            </form> */}
 
                             {/* <!-- Topbar Navbar --> */}
                             <ul className="navbar-nav ml-auto">
 
                                 {/* <!-- Nav Item - Search Dropdown (Visible Only XS) --> */}
                                 <li className="nav-item dropdown no-arrow d-sm-none">
-                                    <a className="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                                    <a className="nav-link dropdown-toggle" id="searchDropdown" role="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i className="fas fa-search fa-fw"></i>
                                     </a>
@@ -150,7 +160,7 @@ const Sidebar = () => {
 
                                 {/* <!-- Nav Item - Alerts --> */}
                                 <li className="nav-item dropdown no-arrow mx-1">
-                                    <a className="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                                    <a className="nav-link dropdown-toggle" id="alertsDropdown" role="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i className="fas fa-bell fa-fw"></i>
                                         {/* <!-- Counter - Alerts --> */}
@@ -162,7 +172,7 @@ const Sidebar = () => {
                                         <h6 className="dropdown-header">
                                             Alerts Center
                                         </h6>
-                                        <a className="dropdown-item d-flex align-items-center" href="#">
+                                        <a className="dropdown-item d-flex align-items-center">
                                             <div className="mr-3">
                                                 <div className="icon-circle bg-primary">
                                                     <i className="fas fa-file-alt text-white"></i>
@@ -173,7 +183,7 @@ const Sidebar = () => {
                                                 <span className="font-weight-bold">A new monthly report is ready to download!</span>
                                             </div>
                                         </a>
-                                        <a className="dropdown-item d-flex align-items-center" href="#">
+                                        <a className="dropdown-item d-flex align-items-center">
                                             <div className="mr-3">
                                                 <div className="icon-circle bg-success">
                                                     <i className="fas fa-donate text-white"></i>
@@ -184,7 +194,7 @@ const Sidebar = () => {
                                                 $290.29 has been deposited into your account!
                                             </div>
                                         </a>
-                                        <a className="dropdown-item d-flex align-items-center" href="#">
+                                        <a className="dropdown-item d-flex align-items-center">
                                             <div className="mr-3">
                                                 <div className="icon-circle bg-warning">
                                                     <i className="fas fa-exclamation-triangle text-white"></i>
@@ -195,98 +205,33 @@ const Sidebar = () => {
                                                 Spending Alert: We've noticed unusually high spending for your account.
                                             </div>
                                         </a>
-                                        <a className="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                                        <a className="dropdown-item text-center small text-gray-500">Show All Alerts</a>
                                     </div>
                                 </li>
 
-                                {/* <!-- Nav Item - Messages --> */}
-                                <li className="nav-item dropdown no-arrow mx-1">
-                                    <a className="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i className="fas fa-envelope fa-fw"></i>
-                                        {/* <!-- Counter - Messages --> */}
-                                        <span className="badge badge-danger badge-counter">7</span>
-                                    </a>
-                                    {/* <!-- Dropdown - Messages --> */}
-                                    <div className="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                        aria-labelledby="messagesDropdown">
-                                        <h6 className="dropdown-header">
-                                            Message Center
-                                        </h6>
-                                        <a className="dropdown-item d-flex align-items-center" href="#">
-                                            <div className="dropdown-list-image mr-3">
-                                                <img className="rounded-circle" src="img/undraw_profile_1.svg"
-                                                    alt="..." />
-                                                <div className="status-indicator bg-success"></div>
-                                            </div>
-                                            <div className="font-weight-bold">
-                                                <div className="text-truncate">Hi there! I am wondering if you can help me with a
-                                                    problem I've been having.</div>
-                                                <div className="small text-gray-500">Emily Fowler · 58m</div>
-                                            </div>
-                                        </a>
-                                        <a className="dropdown-item d-flex align-items-center" href="#">
-                                            <div className="dropdown-list-image mr-3">
-                                                <img className="rounded-circle" src="img/undraw_profile_2.svg"
-                                                    alt="..." />
-                                                <div className="status-indicator"></div>
-                                            </div>
-                                            <div>
-                                                <div className="text-truncate">I have the photos that you ordered last month, how
-                                                    would you like them sent to you?</div>
-                                                <div className="small text-gray-500">Jae Chun · 1d</div>
-                                            </div>
-                                        </a>
-                                        <a className="dropdown-item d-flex align-items-center" href="#">
-                                            <div className="dropdown-list-image mr-3">
-                                                <img className="rounded-circle" src="img/undraw_profile_3.svg"
-                                                    alt="..." />
-                                                <div className="status-indicator bg-warning"></div>
-                                            </div>
-                                            <div>
-                                                <div className="text-truncate">Last month's report looks great, I am very happy with
-                                                    the progress so far, keep up the good work!</div>
-                                                <div className="small text-gray-500">Morgan Alvarez · 2d</div>
-                                            </div>
-                                        </a>
-                                        <a className="dropdown-item d-flex align-items-center" href="#">
-                                            <div className="dropdown-list-image mr-3">
-                                                <img className="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
-                                                    alt="..." />
-                                                <div className="status-indicator bg-success"></div>
-                                            </div>
-                                            <div>
-                                                <div className="text-truncate">Am I a good boy? The reason I ask is because someone
-                                                    told me that people say this to all dogs, even if they aren't good...</div>
-                                                <div className="small text-gray-500">Chicken the Dog · 2w</div>
-                                            </div>
-                                        </a>
-                                        <a className="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
-                                    </div>
-                                </li>
+
 
                                 <div className="topbar-divider d-none d-sm-block"></div>
 
                                 {/* <!-- Nav Item - User Information --> */}
                                 <li className="nav-item dropdown no-arrow">
-                                    <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                    <a className="nav-link dropdown-toggle" id="userDropdown" role="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span className="mr-2 d-none d-lg-inline text-gray-600 small">{userdata.username ? userdata.username : '' }</span>
+                                        <span className="mr-2 d-none d-lg-inline text-gray-600 small">{userdata.username ? userdata.username : ''}</span>
                                         <img className="img-profile rounded-circle"
                                             src={`http://localhost:8082/${userdata.image}`} />
                                     </a>
                                     {/* <!-- Dropdown - User Information --> */}
                                     <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                         aria-labelledby="userDropdown">
-                                        <a className="dropdown-item" href="#">
-                                            <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                            Profile
-                                        </a>
-                                        <a className="dropdown-item" href="#">
+
+                                        <Link to="/user/profile" className="dropdown-item"><i className="ffas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>Profile</Link>
+
+                                        {/* <a className="dropdown-item">
                                             <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                                             Settings
-                                        </a>
-                                        <a className="dropdown-item" href="#">
+                                        </a> */}
+                                        <a className="dropdown-item">
                                             <i className="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                                             Activity Log
                                         </a>

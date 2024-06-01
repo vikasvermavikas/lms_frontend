@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer, Slide } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ConfirmToast } from 'react-confirm-toast';
+import ReactPaginate from 'react-paginate';
+import "react-paginate/theme/basic/react-paginate.css";
 const Users = () => {
     const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
@@ -18,6 +23,10 @@ const Users = () => {
             "authorization": `Bearer ${token}`,
         },
     };
+    const [selectedId, setSelectedId] = useState(null);
+    const buttonAttributes = { disabled: false, 'aria-label': 'Custom Aria Label' };
+    const [show, setShow] = useState(false);
+
     const getuserdata = () => {
         setSearch('');
         axios.get("http://localhost:8082/users", config)
@@ -66,10 +75,12 @@ const Users = () => {
                 })
             })
     };
-    const handeDelete = (id) => {
+    // Functions for handling delete button.
+    const deleteUser = (id) => {
         axios.delete('http://localhost:8082/delete/' + id, config)
             .then(res => {
                 try {
+                    toast.success("User deleted successfully");
                     getuserdata();
                 }
                 catch (err) {
@@ -79,24 +90,48 @@ const Users = () => {
                 }
             })
             .catch(err => console.log(err));
+    };
+    const handeDelete = (id) => {
+        setSelectedId(id);
+        setShow(true);
     }
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const recordsPerPage = 10;
-    const lastIndex = currentPage * recordsPerPage;
-    const firstIndex = lastIndex - recordsPerPage;
-    const records = data.slice(firstIndex, lastIndex);
-    const npage = Math.ceil(data.length / recordsPerPage);
-    const numbers = [...Array(npage + 1).keys()].slice(1);
+
+    // Functions for pagination.
+
+    const itemperpage = 10;
+    const [itemOffset, setItemOffset] = useState(0);
+    const endOffset = itemOffset + itemperpage;
+    const currentItems = data.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(data.length / itemperpage);
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemperpage) % data.length;
+        setItemOffset(newOffset);
+    };
+
+    // end Code for pagination.
 
     return (
         <>
-            <div className="container-fluid text-center">
+            <div className="container-fluid">
+            <ConfirmToast
+                asModal={true}
+                buttonYesText={'Confirm'}
+                buttonYesAttributes={buttonAttributes}
+                customFunction={() => deleteUser(selectedId)}
+                setShowConfirmToast={setShow}
+                showConfirmToast={show}
+                toastText='Do you want to delete this user ?'
+                theme={'snow'}
+            />
+            <ToastContainer transition={Slide} />
+
                 <div className="row">
                     <div className="col-md-12">
                         <h2>
                             Users List
                         </h2>
+                        <h5> Total Users : {data.length} </h5>
                         <div className="d-flex justify-content-end">
                             <Link to="/user/create" className="btn btn-success">Create +</Link>
                         </div>
@@ -116,7 +151,7 @@ const Users = () => {
                 </div>
 
                 <div className="table-responsive">
-                    <table className="table">
+                    <table className="table  text-center">
                         <thead>
                             <tr>
                                 <th>Id</th>
@@ -127,7 +162,7 @@ const Users = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {records.map((user, index) => (
+                            {currentItems.map((user, index) => (
                                 <tr key={index}>
                                     <td>{user.id}</td>
                                     <td>{user.first_name}</td>
@@ -144,7 +179,17 @@ const Users = () => {
                         </tbody>
 
                     </table>
-                    <nav>
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel="next >"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={5}
+                        pageCount={pageCount}
+                        previousLabel="< previous"
+                        renderOnZeroPageCount={null}
+                        containerClassName={"react-paginate"}
+                    />
+                    {/* <nav>
                         <ul className="pagination">
                             <li className="page-item">
                                 <a href="#" className={`page-link ${currentPage === 1 ? 'disabled' : ''}`}
@@ -163,27 +208,13 @@ const Users = () => {
                                     onClick={nextPage}>Next</a>
                             </li>
                         </ul>
-                    </nav>
+                    </nav> */}
                 </div>
             </div>
         </>
     );
 
-    function prePage() {
-        if (currentPage !== firstIndex) {
-            setCurrentPage(currentPage - 1);
-        }
-    }
-
-    function nextPage() {
-        if (currentPage !== lastIndex) {
-            setCurrentPage(currentPage + 1);
-        }
-    }
-
-    function changeCurrentPage(id) {
-        setCurrentPage(id);
-    }
+ 
 };
 
 export default Users;

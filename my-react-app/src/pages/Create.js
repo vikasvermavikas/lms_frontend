@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { toast, ToastContainer, Slide } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Create = () => {
     const token = localStorage.getItem("TOKEN");
@@ -37,7 +39,10 @@ const Create = () => {
                     });
                 }
                 else {
-                    navigate('/user/users');
+                    toast.success("User created successfully");
+                    setTimeout(() => {
+                        navigate('/user/users');
+                    }, 3000);
                 }
             })
             .catch(err => console.log(err));
@@ -45,6 +50,7 @@ const Create = () => {
     return (
         <div className="container d-flex vh-90 justify-content-center align-items-center">
             <div className="bg-white rounded p-3">
+                <ToastContainer transition={Slide} />
                 {error.server ? (<span className='text-danger'>* {error.server}</span>) : ''}
                 <form onSubmit={handleSubmit}>
                     <span><Link to="/user/users" className="btn btn-primary me-2 float-right">Back</Link></span>
@@ -54,7 +60,7 @@ const Create = () => {
                         <div className='col-md-6'>
                             <div className="mb-2">
                                 <label htmlFor="username">Username</label>
-                                <input type="text" className="form-control" placeholder='Enter User Name' onChange={e => setValues({ ...values, username: e.target.value })} required/>
+                                <input type="text" className="form-control" placeholder='Enter User Name' onChange={e => setValues({ ...values, username: e.target.value })} required />
                             </div>
                         </div>
                         <div className='col-md-6'>
@@ -88,12 +94,27 @@ const Create = () => {
                             </div>
                         </div>
                         <div className='col-md-6'>
-                            <div className="mb-2">
                                 <label htmlFor="gender">Gender &nbsp;</label>
-                                <input  type="radio" name="gender" value="male" onChange={e => setValues({ ...values, gender: e.target.value })} /> &nbsp;Male &nbsp;
-                                <input  type="radio" name="gender" value="female" onChange={e => setValues({ ...values, gender: e.target.value })} />  &nbsp; Female
-                                    
+                            <div className="mb-2">
+                            <div className="form-check">
+                                <input className="form-check-input" type="radio" name="gender" value="male" onChange={e => setValues({ ...values, gender: e.target.value })} />
+                                <label className="form-check-label" htmlFor="gender1">
+                                    Male
+                                </label>
                             </div>
+                            <div className="form-check">
+                                <input className="form-check-input" type="radio" name="gender" value="female" checked onChange={e => setValues({ ...values, gender: e.target.value })} />
+                                <label className="form-check-label" htmlFor="gender2">
+                                    Female
+                                </label>
+                            </div>
+                            </div>
+                        </div>
+                        <div className='col-md-6'>
+                        <div className='mt-3'>
+                            <label htmlFor="password">Password</label>
+                            <input type="password" className="form-control" name="password" placeholder="Enter password" onChange={e => setValues({ ...values, password: e.target.value })} />
+                        </div>
                         </div>
                     </div>
                     <button className='btn btn-success'>Submit</button>

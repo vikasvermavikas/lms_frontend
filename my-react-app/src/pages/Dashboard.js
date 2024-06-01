@@ -17,8 +17,8 @@ const Dashboard = () => {
                 {/* <!-- Page Heading --> */}
                 < div className="d-sm-flex align-items-center justify-content-between mb-4" >
                     <h1 className="h3 mb-0 text-gray-800">Dashboard</h1>
-                    <a className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                        className="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                    {/* <a className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                        className="fas fa-download fa-sm text-white-50"></i> Generate Report</a> */}
                 </div >
 
                 {/* <!-- Content Row --> */}
@@ -31,8 +31,8 @@ const Dashboard = () => {
                                 <div className="row no-gutters align-items-center">
                                     <div className="col mr-2">
                                         <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                            Earnings (Monthly)</div>
-                                        <div className="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                            Total Users</div>
+                                        <div className="h5 mb-0 font-weight-bold text-gray-800">6</div>
                                     </div>
                                     <div className="col-auto">
                                         <i className="fas fa-calendar fa-2x text-gray-300"></i>
@@ -49,8 +49,8 @@ const Dashboard = () => {
                                 <div className="row no-gutters align-items-center">
                                     <div className="col mr-2">
                                         <div className="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                            Earnings (Annual)</div>
-                                        <div className="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                            Total Book Categories</div>
+                                        <div className="h5 mb-0 font-weight-bold text-gray-800">3</div>
                                     </div>
                                     <div className="col-auto">
                                         <i className="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -66,19 +66,19 @@ const Dashboard = () => {
                             <div className="card-body">
                                 <div className="row no-gutters align-items-center">
                                     <div className="col mr-2">
-                                        <div className="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
+                                        <div className="text-xs font-weight-bold text-info text-uppercase mb-1">Total Assignments
                                         </div>
                                         <div className="row no-gutters align-items-center">
                                             <div className="col-auto">
-                                                <div className="h5 ms-2 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                                <div className="h5 ms-3 mb-0 mr-3 font-weight-bold text-gray-800">50</div>
                                             </div>
-                                            <div className="col">
+                                            {/* <div className="col">
                                                 <div className="progress progress-sm mr-2">
                                                     <div className="progress-bar bg-info" role="progressbar"
                                                         style={{ width: "50%" }} aria-valuenow="50" aria-valuemin="0"
                                                         aria-valuemax="100"></div>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                     <div className="col-auto">
@@ -96,7 +96,7 @@ const Dashboard = () => {
                                 <div className="row no-gutters align-items-center">
                                     <div className="col mr-2">
                                         <div className="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                            Pending Requests</div>
+                                            Pending For Return</div>
                                         <div className="h5 mb-0 font-weight-bold text-gray-800">18</div>
                                     </div>
                                     <div className="col-auto">

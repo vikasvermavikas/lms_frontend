@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import { toast, ToastContainer, Slide } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ConfirmToast } from 'react-confirm-toast';
+import ReactPaginate from 'react-paginate';
+import "react-paginate/theme/basic/react-paginate.css";
 
 const Books = () => {
+    // Define constants.
     const token = localStorage.getItem('TOKEN');
     const [nextbutton, setNextbutton] = useState('');
     const [assignmentStatuses, setAssignmentStatuses] = useState({});
@@ -16,12 +21,17 @@ const Books = () => {
         search: '',
         list: '',
     });
+    const [show, setShow] = useState(false);
     const config = {
         headers: {
             'Content-Type': 'application/json',
             'authorization': 'Bearer ' + token
         }
     };
+
+    const [selectedId, setSelectedId] = useState(null);
+    const buttonAttributes = { disabled: false, 'aria-label': 'Custom Aria Label' };
+
     const getbookdata = () => {
         axios.get('http://localhost:8082/books/read', config)
             .then(res => {
@@ -48,25 +58,18 @@ const Books = () => {
         setAssignmentStatuses(statuses);
     };
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const recordsPerPage = 10;
-    const lastIndex = currentPage * recordsPerPage;
-    const firstIndex = lastIndex - recordsPerPage;
-    const records = data.slice(firstIndex, lastIndex);   // Filter only specific records.
-    const npage = Math.ceil(data.length / recordsPerPage);  // Round off the values.
-    const numbers = [...Array(npage + 1).keys()].slice(1);
-
     useEffect(() => {
         document.title = "Books List";
         getbookdata();
     }, []);
 
-    useEffect(() => {
-        if (data.length > 0) {
-            fetchAssignmentStatuses(data);
-        }
-    }, [data]);
+    // useEffect(() => {
+    //     if (data.length > 0) {
+    //         // fetchAssignmentStatuses(data);
+    //     }
+    // }, [data]);
 
+    // Submit the form.
     const handleSubmit = (event) => {
         event.preventDefault();
         axios.get("http://localhost:8082/books/read/" + search, config)
@@ -93,9 +96,13 @@ const Books = () => {
     const handleChange = (event) => {
         setSearch(event.target.value);
     };
-    const handeDelete = (id) => {
+
+
+    // Functions for handling delete button.
+    const deleteBook = (id) => {
         axios.delete('http://localhost:8082/books/delete/' + id, config)
             .then(res => {
+                toast.success("Book deleted successfully");
                 getbookdata();
             })
             .catch(err => {
@@ -104,38 +111,52 @@ const Books = () => {
                 })
             });
     };
+    const handeDelete = (id) => {
+        setSelectedId(id);
+        setShow(true);
 
-    const prePage = () => {
-        if (currentPage !== firstIndex) {
-            setCurrentPage(currentPage - 1);
-        }
-    }
+    };
 
-    const nextPage = () => {
-        if (currentPage !== lastIndex) {
-            setCurrentPage(currentPage + 1);
-        }
-        else {
-            setNextbutton('disabled');
-        }
-    }
+    // Functions for pagination.
 
-    const changeCurrentPage = (id) => {
-        setCurrentPage(id);
-    }
+    const itemperpage = 10;
+    const [itemOffset, setItemOffset] = useState(0);
+    const endOffset = itemOffset + itemperpage;
+    const currentItems = data.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(data.length / itemperpage);
+    const handlePageClick = (event) => {
+        const newOffset = (event.selected * itemperpage) % data.length;
+        setItemOffset(newOffset);
+    };
+
+    // end Code for pagination.
+
 
     return (
         <div className="container-fluid">
+            <ConfirmToast
+                asModal={true}
+                buttonYesText={'Confirm'}
+                buttonYesAttributes={buttonAttributes}
+                customFunction={() => deleteBook(selectedId)}
+                setShowConfirmToast={setShow}
+                showConfirmToast={show}
+                toastText='Do you want to delete this book ?'
+                theme={'snow'}
+            />
+            <ToastContainer transition={Slide} />
+
             <div className="row">
                 <div className="col-md-12">
                     <h2>
                         Books List
                     </h2>
+                    <h5> Total Books :  {data.length}</h5>
                     <div className="d-flex justify-content-end">
                         <Link to="/book/create" className="btn btn-success">Add +</Link>
+                        <Link to="/book/assignments" className="btn btn-primary ms-1">Assignments</Link>
                     </div>
                 </div>
-
                 <div className="col-md-12">
                     {error.search ? (<span className="text-danger" role="alert">* {error.search}</span>) : ''}
                     {error.list ? (<span className="text-danger" role="alert">* {error.list}</span>) : ''}
@@ -151,8 +172,8 @@ const Books = () => {
 
                 {/* Table */}
                 <div className="table-responsive">
-                    <table className="table text-center">
-                        <thead>
+                    <table className="table">
+                        <thead className=''>
                             <tr>
                                 <th >Id</th>
                                 <th>Serial Number</th>
@@ -160,30 +181,40 @@ const Books = () => {
                                 <th>Publisher Name</th>
                                 <th>Class</th>
                                 <th>Publish Year</th>
-                                <th>Action</th>
+                                <th className='text-center'>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {records.map((book, index) => (
+                            {currentItems.map((book, index) => (
                                 <tr key={index}>
                                     <td>{index + 1} </td>
                                     <td>{book.serial_number}</td>
                                     <td>{book.book_name}</td>
                                     <td>{book.publisher_name}</td>
                                     <td>{book.class}</td>
-                                    <td>{book.publish_year}</td>
+                                    <td className='text-center'>{book.publish_year}</td>
                                     <td>
                                         <Link to={`/book/read/${book.id}`} className="btn btn-sm btn-primary">Read</Link>
                                         <Link to={`/book/edit/${book.id}`} className="btn btn-sm btn-info ms-2">Edit</Link>
                                         <button onClick={() => handeDelete(book.id)} className="btn btn-sm btn-danger ms-2">Delete</button>
-                                        {assignmentStatuses[book.id] == 'available' ? (<Link to={`/book/assign_book/${book.id}`} className="btn btn-sm btn-warning ms-2">Assign Book</Link>) : (<button className='btn btn-sm btn-warning ms-2 disabled'>Assigned</button>)}
+                                        {book.availability ? (<Link to={`/book/assign_book/${book.id}`} className="btn btn-sm btn-warning ms-2">Assign Book</Link>) : (<button className='btn btn-sm btn-warning ms-2 disabled'>Assigned</button>)}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
 
                     </table>
-                    <nav>
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel="next >"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={5}
+                        pageCount={pageCount}
+                        previousLabel="< previous"
+                        renderOnZeroPageCount={null}
+                        containerClassName={"react-paginate"}
+                    />
+                    {/* <nav>
                         <ul className="pagination">
                             <li className="page-item">
                                 <a href="#" className={`page-link ${currentPage === 1 ? 'disabled' : ''}`}
@@ -202,7 +233,7 @@ const Books = () => {
                                     onClick={nextPage}>Next</a>
                             </li>
                         </ul>
-                    </nav>
+                    </nav> */}
                 </div>
             </div>
         </div>

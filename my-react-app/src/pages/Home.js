@@ -5,7 +5,9 @@ const Home = () => {
   useEffect(() => {
     document.title = "Home";
     axios.get("http://localhost:8082/")
-      .then(res => console.log(res))
+      .then(res => {
+        
+      })
   }, []);
 
   return (

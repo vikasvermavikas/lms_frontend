@@ -1,6 +1,9 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast, ToastContainer, Slide } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const BookAssign = () => {
     const { id } = useParams();
     const token = localStorage.getItem('TOKEN');
@@ -15,7 +18,7 @@ const BookAssign = () => {
         class: '',
         from_date: '',
         to_date: '',
-        assigner_id : JSON.parse(userid).id 
+        assigner_id: JSON.parse(userid).id
     });
 
     const config = {
@@ -72,56 +75,64 @@ const BookAssign = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.post('http://localhost:8082/books/assign', values, config)
-           .then(res => {
+            .then(res => {
                 if (res.data.sqlMessage) {
                     setError({
                         server: res.data.sqlMessage
                     });
                 }
                 else {
-                    navigate('/book/books');
+                    toast.success("Book assigned successfully");
+                    setTimeout(() => {
+                        navigate('/book/books');
+                    }, 3000);
+
                 }
             })
-           .catch(err => {
+            .catch(err => {
                 setError({
                     server: err.response.data
                 });
             })
     };
     return (
-        <div className="d-flex vh-90 justify-content-center align-items-center">
-            <div className="w-50 bg-white rounded p-3">
+        <div className="container d-flex justify-content-center align-items-center">
+            <div className="bg-white rounded p-3">
                 {error.server ? (<span className="text-danger" role="alert">* {error.server}</span>) : ''}
                 {error.list ? (<span className="text-danger" role="alert">* {error.list}</span>) : ''}
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-2">
-                        <label htmlFor="book_name">Book Name</label>
-                        <input type="text" className="form-control" name="book_name" value={bookname} disabled />
-                    </div>
-                    <div className="mb-2">
-                        <label htmlFor="publisher_name">Select User</label>
-                        <select className="form-control" name="userid" onChange={handleInput} required>
-                            <option>Select User</option>
-                            {userdata.map(user => (
-                                <option key={user.id} value={user.id}>{user.username}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="mb-2">
-                        <label htmlFor="class">Class</label>
-                        <input type="text" className="form-control" name="class" onChange={handleInput} required />
-                    </div>
-                    <div className="mb-2">
-                        <label htmlFor="class">From Date</label>
-                        <input type="date" className="form-control" name="from_date" onChange={handleInput} required />
-                    </div>
-                    <div className="mb-2">
-                        <label htmlFor="class">To Date</label>
-                        <input type="date" className="form-control" name="to_date" onChange={handleInput} required />
-                    </div>
+                <Link to="/book/books" className="btn btn-primary me-2 float-right">Back</Link>
+                <ToastContainer transition={Slide} />
 
+                <form onSubmit={handleSubmit}>
+                    <h2>Assign Book</h2>
+                    <div className='row'>
+                        <div className="mb-2 col-md-6">
+                            <label htmlFor="book_name">Book Name</label>
+                            <input type="text" className="form-control" name="book_name" value={bookname} disabled />
+                        </div>
+                        <div className="mb-2 col-md-6">
+                            <label htmlFor="publisher_name">Select User</label>
+                            <select className="form-control" name="userid" onChange={handleInput} required>
+                                <option>Select User</option>
+                                {userdata.map(user => (
+                                    <option key={user.id} value={user.id}>{user.username}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="mb-2 col-md-6">
+                            <label htmlFor="class">Class</label>
+                            <input type="text" className="form-control" name="class" onChange={handleInput} required />
+                        </div>
+                        <div className="mb-2 col-md-6">
+                            <label htmlFor="class">From Date</label>
+                            <input type="date" className="form-control" name="from_date" onChange={handleInput} required />
+                        </div>
+                        <div className="mb-2 col-md-6">
+                            <label htmlFor="class">To Date</label>
+                            <input type="date" className="form-control" name="to_date" onChange={handleInput} required />
+                        </div>
+                    </div>
                     <button className='btn btn-success'>Submit</button>
-                    <Link to="/book/books" className="btn btn-primary me-2">Back</Link>
                 </form>
 
             </div>

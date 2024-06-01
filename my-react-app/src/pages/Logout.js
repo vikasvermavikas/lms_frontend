@@ -43,13 +43,12 @@ const Logout = () => {
             <div className="w-50 bg-white rounded p-3">
                 <form action="" onSubmit={handleSubmit}>
                     <h3 className="text-center">Are you sure you want to logout ?</h3>
-                    <div class="row">
-                        <centre>
+                    <div className="row text-center">
+                       
                             <div className="d-flex justify-content-center text-center w-25 mx-auto">
                                 <button type="submit" className="btn btn-primary">Logout</button>
                                 <Link to='/user/dashboard' className="btn btn-warning  ms-1">Cancel</Link>
                             </div>
-                        </centre>
                     </div>
                 </form>
             </div>

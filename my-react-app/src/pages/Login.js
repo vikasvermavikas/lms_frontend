@@ -38,8 +38,12 @@ const Login = () => {
                     ReactSession.set("USER", res.data.data);
                     localStorage.setItem("USER", JSON.stringify(res.data.data));
                     localStorage.setItem("TOKEN", res.data.token);
-                    
-                    navigate('/user/dashboard');
+                    if (res.data.data.roleid === 2) {
+                        navigate('/guest/dashboard');
+                    }
+                    else{
+                        navigate('/user/dashboard');
+                    }
                 })
                 .catch(err => {
                     console.log(err);

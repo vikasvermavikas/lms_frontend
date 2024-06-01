@@ -1,7 +1,7 @@
 // import logo from './logo.svg';
 // import './App.css';
 import { useState, createContext } from "react";
-import { BrowserRouter, Routes, Route} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
@@ -19,6 +19,9 @@ import Dashboard from "./pages/Dashboard";
 import Logout from "./pages/Logout";
 import Sidebar from "./pages/Sidebar";
 
+import UserProfile from "./users/UserProfile";
+import UpdateProfile from "./users/UpdateProfile";
+
 import Books from "./books/Books";
 import CreateBook from "./books/CreateBook";
 import EditBook from "./books/EditBook";
@@ -26,21 +29,22 @@ import ReadBook from "./books/ReadBook";
 import BookAssignment from "./books/BookAssignment";
 import BookAssign from "./books/BookAssign";
 import BookAssignDetail from "./books/BookAssignDetail";
+import BookStock from "./books/BookStock";
 
-const UserContext = createContext()
+import RequireAuth from './components/RequireAuth';
+import GuestDashboard from './components/GuestDashboard';
+import GuestAssignment from './components/GuestAssignment';
+import AssignmentView from './components/AssignmentView';
+
+// const UserContext = createContext()
 function App() {
-
-
   const token = localStorage.getItem("USER");
 
-  console.log(token);
+  // console.log(token);
 
-
-
-
-  if (!localStorage.getItem("USER")) {
-    <Logout />
-  }
+  // if (!localStorage.getItem("USER")) {
+  //   <Logout />
+  // }
 
   const [count, setCount] = useState(0);
   const [todos, setTodos] = useState(["todo 1", "todo 2"]);
@@ -59,33 +63,42 @@ function App() {
           <Route path="*" element={<NoPage todos={todos} />} />
         </Route>
 
+        {/* <Route element={<RequireAuth />}> */}
+          <Route path="/user/" element={<Sidebar />}>
+            <Route index path="register" element={<RequireAuth><Register /></RequireAuth>} />
+            <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+            <Route path="users" element={<RequireAuth><Users /></RequireAuth>} />
+            <Route path="create" element={<RequireAuth><Create /></RequireAuth>} />
+            <Route path="logout" element={<RequireAuth><Logout /></RequireAuth>} />
+            <Route path="read/:id" element={<RequireAuth><Read /></RequireAuth>} />
+            <Route path="edit/:id" element={<RequireAuth><Edit /></RequireAuth>} />
+            <Route path="profile" element={<RequireAuth><UserProfile /></RequireAuth>} />
+            <Route path="updateProfile" element={<RequireAuth><UpdateProfile /></RequireAuth>} />
+            <Route path="*" element={<NoPage todos={todos} />} />
+          </Route>
 
-        <Route path="/user/" element={<Sidebar />}>
-          <Route index path="register" element={<Register />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="create" element={<Create title="blogs"/>} />
-          <Route path="logout" element={<Logout />} />
-          <Route path="read/:id" element={<Read />} />
-          <Route path="edit/:id" element={<Edit />} />
-          <Route path="*" element={<NoPage todos={todos} />} />
-        </Route>
+          <Route path="/book/" element={<Sidebar />}>
+            <Route index path="books" element={<RequireAuth><Books /></RequireAuth>} />
+            <Route path="create" element={<RequireAuth><CreateBook /></RequireAuth>} />
+            <Route path="edit/:id" element={<RequireAuth><EditBook /></RequireAuth>} />
+            <Route path="read/:id" element={<RequireAuth><ReadBook /></RequireAuth>} />
+            <Route path="assignments" element={<RequireAuth><BookAssignment /></RequireAuth>} />
+            <Route path="assign_book/:id" element={<RequireAuth><BookAssign /></RequireAuth>} />
+            <Route path="assignment_details/:id" element={<RequireAuth><BookAssignDetail /></RequireAuth>} />
+            <Route path="stock" element={<RequireAuth><BookStock /></RequireAuth>} />
+            <Route path="*" element={<NoPage todos={todos} />} />
+          </Route>
 
-        <Route path="/book/" element={<Sidebar />}>
-          <Route index path="books" element={<Books />} />
-          <Route path="create" element={<CreateBook />} />
-          <Route path="edit/:id" element={<EditBook />} />
-          <Route path="read/:id" element={<ReadBook />} />
-          <Route path="assignments" element={<BookAssignment />} />
-          <Route path="assign_book/:id" element={<BookAssign />} />
-          <Route path="assignment_details/:id" element={<BookAssignDetail />} />
-          <Route path="*" element={<NoPage todos={todos} />} />
-        </Route>
-
+          <Route path="/guest/" element={<Sidebar />}>
+          <Route path="dashboard" element={<RequireAuth><GuestDashboard /></RequireAuth>} />
+          <Route path="assignments" element={<RequireAuth><GuestAssignment /></RequireAuth>} />
+          <Route path="book/view/:id" element={<RequireAuth><AssignmentView /></RequireAuth>} />
+          </Route>
+        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   );
-  
+
 }
 
 // export default App;

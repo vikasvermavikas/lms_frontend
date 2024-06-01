@@ -109,18 +109,32 @@ const is_assign = (req, res) => {
     })
 };
 
-const book_return = (req,res) => {
+const book_return = (req, res) => {
     const id = req.params.id;
-    books.return_book(id, function(err, results){
+    books.return_book(id, function (err, results) {
         if (err) {
-            // res.send(err);
-            console.log(err);
+            res.send(err);
+            // console.log(err);
         } else {
-            // res.send(results);
-            console.log(results);
+            res.send(results);
+            // console.log(results);
         }
     })
 
+}
+
+const get_book_stock = (req, res) => {
+    var search = '';
+    if (req.params.search) {
+        var search = req.params.search;
+    }
+    books.get_stock(search, function (err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    })
 }
 module.exports = {
     add_book,
@@ -132,5 +146,6 @@ module.exports = {
     get_book_assignments,
     get_assignment_detail,
     is_assign,
-    book_return
+    book_return,
+    get_book_stock
 };

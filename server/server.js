@@ -12,6 +12,7 @@ const hello_controller = require('./controllers/helloController');
 const userController = require('./controllers/userController');
 const auth = require('./controllers/authController');
 const booksController = require('./controllers/bookController');
+const guestController = require('./controllers/guestController');
 
 const app = express();
 app.use(session({ secret: 'Your_Secret_Key', resave: false, saveUninitialized: true }));
@@ -37,14 +38,19 @@ const upload = multer({ storage });
 // Define routes.
 
 // Define Middleware.
-function verifytoken(req, res, next) {
+async function verifytoken(req, res, next) {
     if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-        jwt.verify(req.headers.authorization.split(' ')[1], secretKey, (err, decode) => {
+        jwt.verify(req.headers.authorization.split(' ')[1], secretKey, async (err, decode) => {
             if (err) {
                 console.log(err);
                 return res.status(401).send('Unauthorized user');
             } else {
                 req.userId = decode.id;
+                const isValid = await userController.is_valid(decode.id);
+                if (!isValid) {
+                    return res.status(401).send('Unauthorized user');
+                }
+
                 next();
             }
         });
@@ -67,6 +73,7 @@ app.get('/books/assignments/:search?', verifytoken, booksController.get_book_ass
 app.get('/books/assignment_detail/:id', verifytoken, booksController.get_assignment_detail);
 app.get('/books/is_assign/:id', verifytoken, booksController.is_assign);
 app.put('/books/bookreturn/:id', verifytoken, booksController.book_return);
+app.get('/books/stock/:search?', verifytoken, booksController.get_book_stock);
 
 
 // ************** Manage Users **************
@@ -104,7 +111,13 @@ app.delete('/delete/:id', verifytoken, userController.delete_user)
 
 // Search user.
 app.get('/user', verifytoken, userController.search);
+
+app.put('/user/updateprofile/:id', verifytoken, upload.single('image'), userController.updateprofile);
 // ************** End Manage users ************
+
+// ************** Guest routes ****************
+app.post('/guest/assignments/:search?', verifytoken, guestController.guestAssignments);
+app.post('/guest/book/view', verifytoken, guestController.guestBookView);
 
 // Listen for changes.
 app.listen(8082, () => {

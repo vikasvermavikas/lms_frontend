@@ -2,6 +2,8 @@ const db = require('../database');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const transporter = require('../config/mail');
+
 const secretKey = 'secretkey';
 
 const salt = 10;
@@ -27,6 +29,30 @@ const login = (req, res) => {
                         }, secretKey, {
                             expiresIn: '1h'
                         }, (err, token) => {
+                            // Configure the mailoptions object
+                            // const mailOptions = {
+                            //     from: 'noreply@gmail.com',
+                            //     to: 'vikas.verma@prakharsoftwares.com',
+                            //     subject: 'Sending Email using Node.js',
+                            //     text: 'That was easy!'
+                            // };
+                            // transporter.verify(function(error, success) {
+                            //     if (error) {
+                            //           console.log('Connection error:', error);
+                            //     } else {
+                            //           console.log('Server is ready to take our messages');
+                            //     }
+                            //   });
+                            // console.log(transporter);
+                            // Send the email
+                            // transporter.sendMail(mailOptions, function (error, info) {
+                            //     if (error) {
+                            //         console.log(error);
+                            //     } else {
+                            //         console.log('Email sent: ' + info.response);
+                            //     }
+                            // });
+
                             return res.json({
                                 status: true,
                                 message: 'Login Success',
@@ -46,7 +72,7 @@ const login = (req, res) => {
 };
 
 const usersignup = (req, res) => {
-    const sql = 'INSERT INTO users (username, first_name, last_name, email, gender, password, image, status, timecreated, timeupdated) VALUES (?)';
+    const sql = 'INSERT INTO users (username, first_name, last_name, email, gender, password, image, status, roleid, timecreated, timeupdated) VALUES (?)';
     const password = req.body.password;
     bcrypt.hash(password.toString(), salt, (err, hash) => {
 
@@ -59,8 +85,9 @@ const usersignup = (req, res) => {
             hash,
             req.file.filename,
             1,
-            Date.now(),
-            Date.now(),
+            1,
+            Math.floor(Date.now() / 1000),
+            Math.floor(Date.now() / 1000),
         ];
 
         db.query(sql, [values], (err, result) => {
