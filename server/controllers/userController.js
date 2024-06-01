@@ -1,4 +1,5 @@
 const Users = require('../models/users');
+const transporter = require('../config/mail');
 
 
 const userlist = (req, res) => {
@@ -25,7 +26,7 @@ const userdata = (req, res) => {
 };
 
 const update_user = (req, res) => {
- 
+
     const id = req.params.id;
     let data = new Users(req.body);
     Users.update(data, id, function (err, results) {
@@ -49,14 +50,36 @@ const delete_user = (req, res) => {
 };
 
 const add_user = (req, res) => {
- 
+
     let data = new Users(req.body);
 
     Users.create(data, function (err, results) {
         if (err) {
             res.send(err);
         } else {
-            res.send(results);
+            const html = `<b>Hi ${data.username}, </b> <p>Welcome to LMS,</p><p>You are successfully registered in LMS</p><p>Your Credentials are given below</p><p>Email id : ${data.email} </p><p>Password : ${data.password}</p><p>Thanks & Regards</p><p>Vikas Verma (CEO)</p>`;
+            const mailOptions = {
+                from: 'noreply@gmail.com',
+                to: data.email,
+                subject: 'Credentials for login in LMS',
+                html: html
+            };
+            // Verify connection configuration.
+            transporter.verify(function (error, success) {
+                if (error) {
+                    console.log('Connection error:', error);
+                } else {
+                    // Send the email
+                    transporter.sendMail(mailOptions, function (error, info) {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            res.send(results);
+                        }
+                    });
+                }
+            });
+
         }
     })
 };

@@ -38,7 +38,9 @@ Users.create = (data, cb) => {
             if (err) {
                 cb(err, null);
             }
-            cb(null, result);
+            else {
+                cb(null, result);
+            }
         });
     })
 };
@@ -115,15 +117,15 @@ Users.updateProfile = (data, id, file, cb) => {
         data.mobile,
         data.aadhar,
     ];
-    
+
     if (file && file.filename) {
         sql += ', `image` = ?';
         values.push(file.filename);
     }
-    
+
     sql += ' WHERE id = ?';
     values.push(id);
-    
+
     connection.query(sql, values, (err, result) => {
         if (err) {
             cb(err, null);

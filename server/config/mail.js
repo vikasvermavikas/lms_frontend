@@ -5,11 +5,11 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
-  secure: true, // use tls
+  secure: false, // use tls
   auth: {
     user: 'rakeshkrmaurya12@gmail.com',
     pass: 'zyvrzwxhqngkiuzc',
   }
 });
 
-module.exports = {transporter};
+module.exports = transporter;

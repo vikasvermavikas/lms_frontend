@@ -2,7 +2,8 @@ const db = require('../database');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const transporter = require('../config/mail');
+// const nodemailer = require('nodemailer');
+
 
 const secretKey = 'secretkey';
 
@@ -29,30 +30,6 @@ const login = (req, res) => {
                         }, secretKey, {
                             expiresIn: '1h'
                         }, (err, token) => {
-                            // Configure the mailoptions object
-                            // const mailOptions = {
-                            //     from: 'noreply@gmail.com',
-                            //     to: 'vikas.verma@prakharsoftwares.com',
-                            //     subject: 'Sending Email using Node.js',
-                            //     text: 'That was easy!'
-                            // };
-                            // transporter.verify(function(error, success) {
-                            //     if (error) {
-                            //           console.log('Connection error:', error);
-                            //     } else {
-                            //           console.log('Server is ready to take our messages');
-                            //     }
-                            //   });
-                            // console.log(transporter);
-                            // Send the email
-                            // transporter.sendMail(mailOptions, function (error, info) {
-                            //     if (error) {
-                            //         console.log(error);
-                            //     } else {
-                            //         console.log('Email sent: ' + info.response);
-                            //     }
-                            // });
-
                             return res.json({
                                 status: true,
                                 message: 'Login Success',
