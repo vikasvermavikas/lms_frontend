@@ -1,8 +1,8 @@
-import react, { useEffect, useState } from 'react';
-import { ReactSession } from 'react-client-session';
+import { useEffect, useState } from 'react';
+// import { ReactSession } from 'react-client-session';
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import {dashboardUrl} from '../config/Constants';
 
 const Logout = () => {
 
@@ -19,7 +19,7 @@ const Logout = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post("http://localhost:8082/logout", values)
+        axios.post(process.env.REACT_APP_SERVER_HOST+"logout", values)
             .then(res => {
 
                 if (res.data.status) {
@@ -47,7 +47,7 @@ const Logout = () => {
                        
                             <div className="d-flex justify-content-center text-center w-25 mx-auto">
                                 <button type="submit" className="btn btn-primary">Logout</button>
-                                <Link to='/user/dashboard' className="btn btn-warning  ms-1">Cancel</Link>
+                                <Link to={dashboardUrl()} className="btn btn-warning  ms-1">Cancel</Link>
                             </div>
                     </div>
                 </form>

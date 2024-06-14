@@ -135,7 +135,65 @@ const get_book_stock = (req, res) => {
             res.send(result);
         }
     })
-}
+} 
+
+const get_total_books = (req, res) => {
+    books.get_total_books(function (err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    })
+};
+const get_total_assignments = (req, res) => {
+    const data = {
+        "userid": req.userId,
+        "roleid": req.roleId
+    };
+    books.get_total_assignments(data, function (err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    })
+};
+const get_total_pending_assign = (req, res) => {
+    const data = {
+        "userid": req.userId,
+        "roleid": req.roleId
+    };
+    books.get_total_pending_assign(data, function (err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    })
+};
+
+const get_book_threshold = (req, res) =>{
+    books.get_threshold(function (err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    });
+};
+
+const update_book_threshold = (req, res) => {
+    const data = req.body;
+    const userid = req.userId;
+    books.update_threshold(data, userid, function (err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+        }
+    });
+};
 module.exports = {
     add_book,
     read_book,
@@ -147,5 +205,10 @@ module.exports = {
     get_assignment_detail,
     is_assign,
     book_return,
-    get_book_stock
+    get_book_stock,
+    get_total_books,
+    get_total_assignments,
+    get_total_pending_assign,
+    get_book_threshold,
+    update_book_threshold
 };

@@ -29,7 +29,7 @@ const Users = () => {
 
     const getuserdata = () => {
         setSearch('');
-        axios.get("http://localhost:8082/users", config)
+        axios.get(process.env.REACT_APP_SERVER_HOST + "users", config)
             .then(res => {
                 if (res.data.length == 0) {
                     setError({
@@ -62,7 +62,7 @@ const Users = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        axios.get("http://localhost:8082/user?search=" + search, config)
+        axios.get(process.env.REACT_APP_SERVER_HOST + "user?search=" + search, config)
             .then(res => {
                 setData(res.data);
                 setError({
@@ -77,7 +77,7 @@ const Users = () => {
     };
     // Functions for handling delete button.
     const deleteUser = (id) => {
-        axios.delete('http://localhost:8082/delete/' + id, config)
+        axios.delete(process.env.REACT_APP_SERVER_HOST + 'delete/' + id, config)
             .then(res => {
                 try {
                     toast.success("User deleted successfully");
@@ -114,68 +114,91 @@ const Users = () => {
     return (
         <>
             <div className="container-fluid">
-            <ConfirmToast
-                asModal={true}
-                buttonYesText={'Confirm'}
-                buttonYesAttributes={buttonAttributes}
-                customFunction={() => deleteUser(selectedId)}
-                setShowConfirmToast={setShow}
-                showConfirmToast={show}
-                toastText='Do you want to delete this user ?'
-                theme={'snow'}
-            />
-            <ToastContainer transition={Slide} />
+                <ConfirmToast
+                    asModal={true}
+                    buttonYesText={'Confirm'}
+                    buttonYesAttributes={buttonAttributes}
+                    customFunction={() => deleteUser(selectedId)}
+                    setShowConfirmToast={setShow}
+                    showConfirmToast={show}
+                    toastText='Do you want to delete this user ?'
+                    theme={'snow'}
+                />
+                <ToastContainer transition={Slide} />
 
                 <div className="row">
                     <div className="col-md-12">
                         <h2>
-                            Users List
+                            Readers List
                         </h2>
-                        <h5> Total Users : {data.length} </h5>
+                        <h5> Total Readers : {data.length} </h5>
                         <div className="d-flex justify-content-end">
+                            <Link to="/user/qrSearch" className="btn btn-primary mr-2">Search By QR</Link>
                             <Link to="/user/create" className="btn btn-success">Create +</Link>
                         </div>
                     </div>
                     {error.search ? (<span className="alert alert-danger" role="alert">{error.search}</span>) : ''}
                     {error.list ? (<span className="alert alert-danger" role="alert">{error.list}</span>) : ''}
                     <div className="col-md-12">
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-group d-flex w-50">
-                                <input className="form-control" type="text" value={search} name='search' placeholder="Search" onChange={handlechange}
-                                    required />
-                                <button type="submit" className="btn btn-primary ms-2">Search</button>
-                                <button onClick={getuserdata} className="btn btn-danger ms-2">Clear</button>
+                        <form onSubmit={handleSubmit} className="form-inline">
+                            <div className="form-group row">
+                                <div className="col-md-6">
+                                    <input className="form-control" type="text" value={search} name='search' placeholder="Search by name and email" onChange={handlechange}
+                                        required />
+                                </div>
+                                <div className="col-md-6">
+                                    <button type="submit" className="btn btn-primary ms-2">Search</button>
+                                    <button onClick={getuserdata} className="btn btn-danger ms-2">Clear</button>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
 
                 <div className="table-responsive">
-                    <table className="table  text-center">
+                    <table className="table text-center">
                         <thead>
                             <tr>
-                                <th>Id</th>
+                                <th>Libary Id</th>
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Email</th>
+                                <th>Subscription</th>
+                                <th>Pending Days</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {currentItems.map((user, index) => (
-                                <tr key={index}>
-                                    <td>{user.id}</td>
+                            {currentItems.map((user, index) => {
+                                var currentdate = Date.now(); // current date in milliseconds.
+                                var subscription_end_date = new Date(user.subscription_end_date * 1000); // subscription date in milliseconds.
+                                var daysleft = (Math.floor((subscription_end_date - currentdate) / (1000 * 3600 * 24))); // days left.
+                                if (daysleft > 0) {
+                                    var showleft = '-' + daysleft + ' days';
+                                }
+                                else if (daysleft == 0) {
+                                    var showleft = 'Suscription Expired Today';
+                                }
+                                else {
+                                    var showleft = 'Suscription Expired';
+
+                                }
+                                return (<tr key={index}>
+                                    <td>{user.library_id}</td>
                                     <td>{user.first_name}</td>
                                     <td>{user.last_name}</td>
-                                    <td>{user.email}</td>
+                                    <td className="text-wrap">{user.email}</td>
+                                    <td>{user.subscription_days} days</td>
+                                    <td className="text-danger">{showleft}</td>
                                     <td>
-                                        <Link to={`/user/read/${user.id}`} className="btn btn-sm btn-primary ms-2">Read</Link>
-                                        <Link to={`/user/edit/${user.id}`} className="btn btn-sm btn-info ms-2">Edit</Link>
-                                        <button onClick={() => handeDelete(user.id)} className="btn btn-sm btn-danger ms-2">Delete</button>
-
+                                        <div className="">
+                                            <Link to={`/user/read/${user.id}`} className="btn btn-sm btn-primary ml-1 mt-1">View</Link>
+                                            <Link to={`/user/edit/${user.id}`} className="btn btn-sm btn-info ml-1 mt-1">Edit</Link>
+                                            <button onClick={() => handeDelete(user.id)} className="btn btn-sm btn-danger ml-1 mt-1">Delete</button>
+                                        </div>
                                     </td>
-                                </tr>
-                            ))}
+                                </tr>)
+                            })}
                         </tbody>
 
                     </table>
@@ -189,32 +212,13 @@ const Users = () => {
                         renderOnZeroPageCount={null}
                         containerClassName={"react-paginate"}
                     />
-                    {/* <nav>
-                        <ul className="pagination">
-                            <li className="page-item">
-                                <a href="#" className={`page-link ${currentPage === 1 ? 'disabled' : ''}`}
-                                    onClick={prePage}>Prev</a>
-                            </li>
-                            {
-                                numbers.map((n, i) => (
-                                    <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
-                                        <a href="#" className="page-link" onClick={() => changeCurrentPage(n)}> {n} </a>
-                                    </li>
-                                ))
-                            }
 
-                            <li className="page-item">
-                                <a href="#" className={`page-link ${currentPage === npage ? 'disabled' : ''}`}
-                                    onClick={nextPage}>Next</a>
-                            </li>
-                        </ul>
-                    </nav> */}
                 </div>
             </div>
         </>
     );
 
- 
+
 };
 
 export default Users;

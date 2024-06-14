@@ -30,7 +30,7 @@ const BookAssignment = () => {
     // Functions for handling delete button.
     const bookReturn = (id) => {
         const data = { "return": 1 };
-        axios.put('http://localhost:8082/books/bookreturn/' + id, data, config)
+        axios.put(process.env.REACT_APP_SERVER_HOST+'books/bookreturn/' + id, data, config)
             .then(res => {
                 toast.success("Book return successfully");
                 getUserAssignments();
@@ -55,7 +55,7 @@ const BookAssignment = () => {
         setValues({ ...values, [e.target.name]: e.target.value });
     };
     const getUserAssignments = () => {
-        axios.get('http://localhost:8082/books/assignments/', config)
+        axios.get(process.env.REACT_APP_SERVER_HOST+'books/assignments/', config)
             .then(res => {
                 setData(res.data);
                 // console.log(res.data);
@@ -76,7 +76,7 @@ const BookAssignment = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.get('http://localhost:8082/books/assignments/' + values.search.trim(), config)
+        axios.get(process.env.REACT_APP_SERVER_HOST+'books/assignments/' + values.search.trim(), config)
             .then(res => {
                 setData(res.data);
             })

@@ -42,7 +42,7 @@ const Register = () => {
             formData.append('password',values.password);
             formData.append('gender', values.gender);
             formData.append('image', values.image);
-           axios.post('http://localhost:8082/signup', formData)
+           axios.post(process.env.REACT_APP_SERVER_HOST+'signup', formData)
            .then((response) => {
             navigate('/login');
            })

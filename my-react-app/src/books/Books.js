@@ -33,7 +33,7 @@ const Books = () => {
     const buttonAttributes = { disabled: false, 'aria-label': 'Custom Aria Label' };
 
     const getbookdata = () => {
-        axios.get('http://localhost:8082/books/read', config)
+        axios.get(process.env.REACT_APP_SERVER_HOST+'books/read', config)
             .then(res => {
                 setData(res.data);
             })
@@ -46,7 +46,7 @@ const Books = () => {
     const fetchAssignmentStatuses = async (books) => {
         const statuses = {};
         const requests = books.map(book =>
-            axios.get(`http://localhost:8082/books/is_assign/${book.id}`, config)
+            axios.get(process.env.REACT_APP_SERVER_HOST+`books/is_assign/${book.id}`, config)
                 .then(res => {
                     statuses[book.id] = res.data;
                 })
@@ -72,7 +72,7 @@ const Books = () => {
     // Submit the form.
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.get("http://localhost:8082/books/read/" + search, config)
+        axios.get(process.env.REACT_APP_SERVER_HOST+"books/read/" + search, config)
             .then(res => {
                 if (res.data.length == 0) {
                     setError({
@@ -100,7 +100,7 @@ const Books = () => {
 
     // Functions for handling delete button.
     const deleteBook = (id) => {
-        axios.delete('http://localhost:8082/books/delete/' + id, config)
+        axios.delete(process.env.REACT_APP_SERVER_HOST+'books/delete/' + id, config)
             .then(res => {
                 toast.success("Book deleted successfully");
                 getbookdata();
@@ -155,6 +155,7 @@ const Books = () => {
                     <div className="d-flex justify-content-end">
                         <Link to="/book/create" className="btn btn-success">Add +</Link>
                         <Link to="/book/assignments" className="btn btn-primary ms-1">Assignments</Link>
+                        <Link to="/book/threshold" className="btn btn-info ms-1">Update Threshold</Link>
                     </div>
                 </div>
                 <div className="col-md-12">
@@ -179,7 +180,7 @@ const Books = () => {
                                 <th>Serial Number</th>
                                 <th>Book Name</th>
                                 <th>Publisher Name</th>
-                                <th>Class</th>
+                                <th>Category</th>
                                 <th>Publish Year</th>
                                 <th className='text-center'>Action</th>
                             </tr>
@@ -194,7 +195,7 @@ const Books = () => {
                                     <td>{book.class}</td>
                                     <td className='text-center'>{book.publish_year}</td>
                                     <td>
-                                        <Link to={`/book/read/${book.id}`} className="btn btn-sm btn-primary">Read</Link>
+                                        <Link to={`/book/read/${book.id}`} className="btn btn-sm btn-primary">View</Link>
                                         <Link to={`/book/edit/${book.id}`} className="btn btn-sm btn-info ms-2">Edit</Link>
                                         <button onClick={() => handeDelete(book.id)} className="btn btn-sm btn-danger ms-2">Delete</button>
                                         {book.availability ? (<Link to={`/book/assign_book/${book.id}`} className="btn btn-sm btn-warning ms-2">Assign Book</Link>) : (<button className='btn btn-sm btn-warning ms-2 disabled'>Assigned</button>)}

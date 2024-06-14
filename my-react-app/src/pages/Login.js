@@ -14,7 +14,8 @@ const Login = () => {
 
     const [errors, setErrors] = useState({
         email: "",
-        password: ""
+        password: "",
+        server: "",
     });
 
     useEffect(() => {
@@ -32,18 +33,26 @@ const Login = () => {
         e.preventDefault();
         setErrors(Validation(values));
         if (errors.email === '' && errors.password === '') {
-            axios.post("http://localhost:8082/login", values)
+            axios.post(process.env.REACT_APP_SERVER_HOST+"login", values)
                 .then(res => {
-                    ReactSession.setStoreType("sessionStorage");
-                    ReactSession.set("USER", res.data.data);
-                    localStorage.setItem("USER", JSON.stringify(res.data.data));
-                    localStorage.setItem("TOKEN", res.data.token);
-                    if (res.data.data.roleid === 2) {
-                        navigate('/guest/dashboard');
+                    if (res.data.status == true) {
+                        ReactSession.setStoreType("sessionStorage");
+                        ReactSession.set("USER", res.data.data);
+                        localStorage.setItem("USER", JSON.stringify(res.data.data));
+                        localStorage.setItem("TOKEN", res.data.token);
+                        if (res.data.data.roleid === 2) {
+                            navigate('/guest/dashboard');
+                        }
+                        else{
+                            navigate('/user/dashboard');
+                        }
                     }
                     else{
-                        navigate('/user/dashboard');
+                        setErrors({
+                            server: res.data.message,
+                        });
                     }
+                   
                 })
                 .catch(err => {
                     console.log(err);
@@ -56,6 +65,7 @@ const Login = () => {
             <div className="w-50 bg-white rounded p-3">
                 <form action="" onSubmit={handleSubmit}>
                     <h1 className="text-center mb-4">Login</h1>
+                    {errors.server && <span className="text-danger">{errors.server}</span>}
                     <div className="form-group">
 
                         <div className="mb-3">

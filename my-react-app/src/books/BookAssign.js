@@ -8,6 +8,8 @@ const BookAssign = () => {
     const { id } = useParams();
     const token = localStorage.getItem('TOKEN');
     const userid = localStorage.getItem('USER');
+    const [submitdisable, setSubmitdisable] = useState('');
+
     const [error, setError] = useState({
         server: '',
         list: ''
@@ -32,7 +34,7 @@ const BookAssign = () => {
     // Get Book Name.
     const [bookname, setBookname] = useState('');
     const getbookdata = () => {
-        axios.get('http://localhost:8082/books/edit/' + id, config)
+        axios.get(process.env.REACT_APP_SERVER_HOST+'books/edit/' + id, config)
             .then(res => {
                 setBookname(res.data[0].book_name);
                 setError({
@@ -49,7 +51,7 @@ const BookAssign = () => {
     // Get User Name.
     const [userdata, setUserdata] = useState([]);
     const getuserdata = () => {
-        axios.get("http://localhost:8082/users", config)
+        axios.get(process.env.REACT_APP_SERVER_HOST+"users", config)
             .then(res => {
                 setUserdata(res.data);
                 setError({
@@ -74,14 +76,21 @@ const BookAssign = () => {
     // Handle form submission.
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:8082/books/assign', values, config)
+        setSubmitdisable('disabled');
+        axios.post(process.env.REACT_APP_SERVER_HOST+'books/assign', values, config)
             .then(res => {
                 if (res.data.sqlMessage) {
                     setError({
                         server: res.data.sqlMessage
                     });
                 }
+                else if (res.data.status == 'failed') {
+                    setError({
+                        list: res.data.error
+                    });
+                }
                 else {
+
                     toast.success("Book assigned successfully");
                     setTimeout(() => {
                         navigate('/book/books');
@@ -96,7 +105,7 @@ const BookAssign = () => {
             })
     };
     return (
-        <div className="container d-flex justify-content-center align-items-center">
+        <div className="container vh-100">
             <div className="bg-white rounded p-3">
                 {error.server ? (<span className="text-danger" role="alert">* {error.server}</span>) : ''}
                 {error.list ? (<span className="text-danger" role="alert">* {error.list}</span>) : ''}
@@ -106,33 +115,45 @@ const BookAssign = () => {
                 <form onSubmit={handleSubmit}>
                     <h2>Assign Book</h2>
                     <div className='row'>
-                        <div className="mb-2 col-md-6">
+                        <div className="col-md-6">
+                            <div className='form-floating mb-3 mt-3'>
+                            <input type="text" className="form-control" name="book_name" placeholder='Enter Book Name' value={bookname} disabled />
                             <label htmlFor="book_name">Book Name</label>
-                            <input type="text" className="form-control" name="book_name" value={bookname} disabled />
+                            </div>
                         </div>
-                        <div className="mb-2 col-md-6">
-                            <label htmlFor="publisher_name">Select User</label>
+                        
+                        <div className="col-md-6">
+                        <div className='form-floating mb-3 mt-3'>
                             <select className="form-control" name="userid" onChange={handleInput} required>
                                 <option>Select User</option>
                                 {userdata.map(user => (
                                     <option key={user.id} value={user.id}>{user.username}</option>
-                                ))}
+                                    ))}
                             </select>
+                                <label htmlFor="publisher_name">Select User</label>
                         </div>
-                        <div className="mb-2 col-md-6">
+                        </div>
+                        <div className="col-md-6">
+                            <div className='form-floating mb-3 mt-3'>
+                            <input type="text" className="form-control" name="class" onChange={handleInput} placeholder='Enter Class' required />
                             <label htmlFor="class">Class</label>
-                            <input type="text" className="form-control" name="class" onChange={handleInput} required />
                         </div>
-                        <div className="mb-2 col-md-6">
+                        </div>
+                        <div className="col-md-6">
+                            <div className='form-floating mb-3 mt-3'>
+                            <input type="date" className="form-control" name="from_date" placeholder='Select date from calender' onChange={handleInput} required />
                             <label htmlFor="class">From Date</label>
-                            <input type="date" className="form-control" name="from_date" onChange={handleInput} required />
                         </div>
-                        <div className="mb-2 col-md-6">
+                        </div>
+                        <div className="col-md-6">
+                            <div className='form-floating mb-3 mt-3'>
+                            <input type="date" className="form-control" name="to_date" placeholder='Select date from calender' onChange={handleInput} required />
                             <label htmlFor="class">To Date</label>
-                            <input type="date" className="form-control" name="to_date" onChange={handleInput} required />
+                        </div>
                         </div>
                     </div>
-                    <button className='btn btn-success'>Submit</button>
+                    <button className={'btn btn-success ' + submitdisable}>Submit</button>
+
                 </form>
 
             </div>

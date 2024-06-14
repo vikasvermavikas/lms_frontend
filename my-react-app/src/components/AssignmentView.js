@@ -26,7 +26,7 @@ const AssignmentView = () => {
             bookid : bookid,
             userid : userid
         };
-        const response = await axios.post('http://localhost:8082/guest/book/view', requestdata, config);
+        const response = await axios.post(process.env.REACT_APP_SERVER_HOST+'guest/book/view', requestdata, config);
         if (response.status === 200) {
             setValues(response.data[0]);
         }

@@ -22,7 +22,7 @@ const GuestDashboard = () => {
     const getbookdata = async () => {
         setSearch('');
         try {
-            const res = await axios.post('http://localhost:8082/guest/assignments', {
+            const res = await axios.post(process.env.REACT_APP_SERVER_HOST+'guest/assignments', {
                 guestid
             }, config);
             setData(res.data);
@@ -43,7 +43,7 @@ const GuestDashboard = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:8082/guest/assignments/' + search, {
+            const res = await axios.post(process.env.REACT_APP_SERVER_HOST+'guest/assignments/' + search, {
                 guestid
             }, config);
             setData(res.data);

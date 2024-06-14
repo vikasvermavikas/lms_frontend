@@ -6,7 +6,7 @@ const UserProfile = () => {
     const user = JSON.parse(localStorage.getItem('USER'));
     const [userdata, setUserdata] = useState({});
     const getUserData = async () => {
-        const response = await axios.get('http://localhost:8082/read/'+ user.id, {
+        const response = await axios.get(process.env.REACT_APP_SERVER_HOST+'read/'+ user.id, {
             headers: {
                 'authorization': `Bearer ${token}`,
             },
@@ -30,7 +30,7 @@ const UserProfile = () => {
                                 <div className="row g-0">
                                     <div className="col-md-4 gradient-custom text-center text-black"
                                         style={{ borderTopLeftRadius: '.5rem', borderBottomLeftRadius: '.5rem' }}>
-                                        <img src={`http://localhost:8082/${userdata.image}`}
+                                        <img src={process.env.REACT_APP_SERVER_HOST+`${userdata.image}`}
                                             alt="Avatar" className="img-fluid my-5 rounded w-75" />
                                         <h5>{userdata.first_name + " " + userdata.last_name}</h5>
                                         <Link to="/user/updateProfile">
@@ -46,8 +46,12 @@ const UserProfile = () => {
                                                     <h6>User Name</h6>
                                                     <p className="text-muted">{userdata.username}</p>
                                                 </div>
+                                               {userdata.library_id && <div className="col-6 mb-3">
+                                                    <h6>Library Id</h6>
+                                                    <p className="text-muted">{userdata.library_id}</p>
+                                                </div>} 
                                                 <div className="col-6 mb-3">
-                                                    <h6>Phone</h6>
+                                                    <h6>Mobile</h6>
                                                     <p className="text-muted">{userdata.mobile}</p>
                                                 </div>
                                                 <div className="col-6 mb-3">
@@ -58,10 +62,7 @@ const UserProfile = () => {
                                                     <h6>Email</h6>
                                                     <p className="text-muted">{userdata.email}</p>
                                                 </div>
-                                                <div className="col-6 mb-3">
-                                                    <h6>Mobile</h6>
-                                                    <p className="text-muted">{userdata.mobile}</p>
-                                                </div>
+
                                                 <div className="col-6 mb-3">
                                                     <h6>Aadhar No.</h6>
                                                     <p className="text-muted">{userdata.aadhar}</p>

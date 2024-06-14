@@ -1,22 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 const UpdateProfile = () => {
     const token = localStorage.getItem('TOKEN');
     const [error, setError] = useState({
         token: '',
         server: '',
+        otp: '',
     });
+    const [otpSent, setOtpSent] = useState(true);
+    const [otpvalue, setOtpvalue] = useState('');
+    const [otpTimer, setOtpTimer] = useState(59);
+    const [resendotp, setResendotp] = useState('');
+    const [submitdisable, setSubmitdisable] = useState('');
     const [user, setUser] = useState({});
+    const sendOtpButtonRef = useRef(null); // Create a ref for the send OTP button
+    const closemodel = useRef(null); // Create a ref for the send OTP button
+    const inputstyle = {
+        height: '40px',
+        margin: '5px',
+        textAlign: 'center',
+        fontSize: '1.2em',
+    };
     const config = {
         headers: {
             "Content-type": "multipart/form-data",
             "authorization": `Bearer ${token}`,
         },
     };
+    const mailconfig = {
+        headers: {
+            "Content-type": "application/json",
+            "authorization": `Bearer ${token}`,
+        },
+    };
     const userdata = JSON.parse(localStorage.getItem('USER'));
     const getUserData = async () => {
-        const response = await axios.get('http://localhost:8082/read/' + userdata.id, {
+        const response = await axios.get(process.env.REACT_APP_SERVER_HOST+'read/' + userdata.id, {
             headers: {
                 'authorization': `Bearer ${token}`,
             },
@@ -29,18 +50,17 @@ const UpdateProfile = () => {
         document.title = 'Update Profile';
         getUserData();
     }, []);
-    
+
     const navigate = useNavigate();
     const handlechange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
-  
+
     const handleFile = (e) => {
         setUser({ ...user, image: e.target.files[0] });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const updateuserprofile = (e) => {
         const formData = new FormData();
         formData.append('first_name', user.first_name);
         formData.append('last_name', user.last_name);
@@ -49,7 +69,7 @@ const UpdateProfile = () => {
         formData.append('image', user.image);
         formData.append('mobile', user.mobile);
         formData.append('aadhar', user.aadhar);
-        axios.put('http://localhost:8082/user/updateprofile/' + user.id, formData, config)
+        axios.put(process.env.REACT_APP_SERVER_HOST+'user/updateprofile/' + user.id, formData, config)
             .then((response) => {
                 if (response.errno) {
                     setError({
@@ -57,16 +77,111 @@ const UpdateProfile = () => {
                     });
                 }
                 else {
+                    setOtpSent(false);
+                    closemodel.current.click();
                     navigate('/user/profile');
                 }
             })
             .catch((error) => {
                 console.log(error);
             });
-
     };
 
-    
+    const data = {
+        id: userdata.id,
+        name: `${userdata.first_name + " " + userdata.last_name}`,
+        to: userdata.email,
+    };
+
+    const starttimer = () => {
+        let timer;
+        var timeconstant = 59;
+        if (timeconstant > 0) {
+            timer = setInterval(() => {
+                if (timeconstant == 0) {
+                    setResendotp('True');
+                    clearInterval(timer);
+                }
+                else {
+                    timeconstant = timeconstant - 1;
+                    setOtpTimer(timeconstant);
+                }
+            }, 1000);
+        }
+    };
+
+    const resentOtp = () => {
+        setResendotp('');
+        setOtpTimer(59);
+        starttimer();
+        setError({
+            otp: ''
+        });
+        axios.post(process.env.REACT_APP_SERVER_HOST+'user/sendmail', data, mailconfig)
+            .then(res => { })
+            .catch((error) => {
+                setError({
+                    otp: error
+                });
+            });
+    };
+
+    const formatTimer = (time) => {
+        return time < 10 ? `0${time}` : time;
+    };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        try {
+            if (sendOtpButtonRef.current) {
+                sendOtpButtonRef.current.click();
+                starttimer();
+                setSubmitdisable('disabled');
+            }
+            const response = axios.post(process.env.REACT_APP_SERVER_HOST+'user/sendmail', data, mailconfig);
+            if (response.status === 200) {
+
+            }
+        }
+        catch (err) {
+            console.log(err);
+        }
+
+    };
+    const handleOtp = (e) => {
+        setOtpvalue(e.target.value);
+    };
+
+    const validateOtp = (e) => {
+        e.preventDefault();
+        const otpdata = {
+            otp: otpvalue,
+            id: userdata.id
+        };
+        axios.post(process.env.REACT_APP_SERVER_HOST+'user/validateOtp', otpdata, mailconfig)
+            .then((response) => {
+                if (response.data.length > 0) {
+                    if (response.data[0].errormessage) {
+                        setError({
+                            otp: response.data[0].errormessage
+                        });
+                    }
+                    else {
+                        updateuserprofile();
+                    }
+                }
+                else {
+                    setError({
+                        otp: 'Invalid otp'
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+
     return (
         <div className="container justify-content-center align-items-center">
             <div className="w-100 bg-white rounded p-3">
@@ -109,7 +224,7 @@ const UpdateProfile = () => {
                             </div>
                         </div>
                         <div className="col-md-6 mb-2">
-                            <label htmlFor="mobile">mobile</label>
+                            <label htmlFor="mobile">Mobile</label>
                             <input type="number" className="form-control" name="mobile" value={user.mobile} placeholder='Enter Mobile' onChange={handlechange} required />
                         </div>
                         <div className="col-md-6 mb-2">
@@ -121,8 +236,41 @@ const UpdateProfile = () => {
                             <input type="file" accept='.jpg,.jpeg,.png' className="form-control" name="image" onChange={handleFile} />
                         </div>
                     </div>
-                    <button className='btn btn-success'>Submit</button>
+                    <button className={'btn btn-success ' + submitdisable}>Submit</button>
                 </form>
+                {/* Modal */}
+                <button type="button" ref={sendOtpButtonRef} className="btn btn-primary d-none" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Send Otp</button>
+
+                {otpSent && (<div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="exampleModalLabel">OTP</h5>
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form onSubmit={validateOtp}>
+                                <div className="modal-body">
+                                    <p className='text-success'>OTP has been sent successfully to {userdata.email}!</p>
+                                    <div className="form-group">
+                                        <label htmlFor="otp" className="col-form-label">Enter OTP</label>
+                                        {resendotp ? (<span className='btn btn-primary float-right pt-2' onClick={resentOtp}>Resend</span>) : (<span className='text-danger float-right pt-2'>00:{formatTimer(otpTimer)}</span>)}
+
+                                        <div >
+                                            <input type="number" style={inputstyle} className="form-control" name="otp" onChange={handleOtp} required />
+                                            {error.otp && (<span className='text-danger'>{error.otp}</span>)}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" ref={closemodel} className="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" className="btn btn-primary">Update Profile</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>)}
 
             </div>
         </div>

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
+import Languages from '../components/Languages';
 
 const ReadBook = () => {
     const { id } = useParams();
     const token = localStorage.getItem("TOKEN");
     const user = localStorage.getItem("USER");
-
+    const [languages, setLanguages] = useState(Languages);
     const [values, setValues] = useState({
         book_name: '',
         publisher_name: '',
@@ -14,6 +15,7 @@ const ReadBook = () => {
         quantity: '',
         price_per_book: '',
         publish_year: '',
+        lang: '',
         buying_date: '',
         userid: JSON.parse(user).id,
     });
@@ -28,8 +30,13 @@ const ReadBook = () => {
         server: ''
     });
 
+    const getLabelByValue = (value) => {
+        const language = languages.find(lang => lang.value === value);
+        return language ? language.label : 'Not Available';
+    };
+
     const getbookdata = () => {
-        axios.get('http://localhost:8082/books/edit/' + id, config)
+        axios.get(process.env.REACT_APP_SERVER_HOST+'books/edit/' + id, config)
             .then(res => {
                 setValues(res.data[0]);
                 setError({
@@ -87,6 +94,10 @@ const ReadBook = () => {
             <div className='col-md-4 d-flex mb-2'>
                 <label> Buying Date : </label>
                 <p><b> {values.buying_date}</b></p>
+            </div>
+            <div className='col-md-4 d-flex mb-2'>
+                <label> Language : </label>
+                <p><b> {getLabelByValue(values.lang)}</b></p>
             </div>
         </div>
     )

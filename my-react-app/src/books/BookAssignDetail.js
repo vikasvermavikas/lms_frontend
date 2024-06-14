@@ -15,7 +15,7 @@ const BookAssignDetail = () => {
         }
     };
     const getfullDetail = () => {
-        axios.get('http://localhost:8082/books/assignment_detail/' + id, config)
+        axios.get(process.env.REACT_APP_SERVER_HOST+'books/assignment_detail/' + id, config)
             .then(res => {
                 setData(res.data[0]);
                 setError({

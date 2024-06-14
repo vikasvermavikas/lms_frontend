@@ -1,19 +1,16 @@
 import React, { useEffect } from "react";
-import axios from "axios";
 
 const Home = () => {
   useEffect(() => {
     document.title = "Home";
-    axios.get("http://localhost:8082/")
-      .then(res => {
-        
-      })
+    // axios.get("http://localhost:8082/")
+    //   .then(res => {
+
+    //   })
   }, []);
 
   return (
     <>
-
-
       <section id="hero" className="d-flex align-items-center">
         <div className="container" data-aos="zoom-out" data-aos-delay="100">
           <h1>Welcome to <span>Library Management System</span></h1>
@@ -30,44 +27,10 @@ const Home = () => {
         <section id="featured-services" className="featured-services">
           <div className="container" data-aos="fade-up">
 
-            {/* <div className="row">
-              <div className="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-                <div className="icon-box" data-aos="fade-up" data-aos-delay="100">
-                  <div className="icon"><i className="bx bxl-dribbble"></i></div>
-                  <h4 className="title"><a href="">Acquisition & Cataloguing</a></h4>
-                  <p className="description">The acquisition & cataloguing module of the library management system enables the librarian to select & buy books, journals, and other resources and create a database of the same for easy book search.</p>
-                </div>
-              </div>
-
-              <div className="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-                <div className="icon-box" data-aos="fade-up" data-aos-delay="200">
-                  <div className="icon"><i className="bx bx-file"></i></div>
-                  <h4 className="title"><a href="">Sed ut perspiciatis</a></h4>
-                  <p className="description">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
-                </div>
-              </div>
-
-              <div className="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-                <div className="icon-box" data-aos="fade-up" data-aos-delay="300">
-                  <div className="icon"><i className="bx bx-tachometer"></i></div>
-                  <h4 className="title"><a href="">Magni Dolores</a></h4>
-                  <p className="description">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia</p>
-                </div>
-              </div>
-
-              <div className="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-                <div className="icon-box" data-aos="fade-up" data-aos-delay="400">
-                  <div className="icon"><i className="bx bx-world"></i></div>
-                  <h4 className="title"><a href="">Nemo Enim</a></h4>
-                  <p className="description">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis</p>
-                </div>
-              </div>
-
-            </div> */}
             <div className="row prod-feature-sec margin-btm-20">
               <div className="col-md-4 col-sm-6 mb-3">
                 <div className="icon-box" data-aos="fade-up" data-aos-delay="400">
-                <div className="icon"><i className="bx bx-world"></i></div>
+                  <div className="icon"><i className="bx bx-world"></i></div>
                   <h3><a>Acquisition &amp; Cataloguing</a></h3>
                   <p>The acquisition &amp; cataloguing module of the library management system enables the librarian to select &amp; buy books, journals, and other resources and create a database of the same for easy book search.</p>
                 </div>
@@ -106,7 +69,7 @@ const Home = () => {
           </div>
         </section>
 
-        <section id="about" className="about section-bg">
+        {/* <section id="about" className="about section-bg">
           <div className="container" data-aos="fade-up">
 
             <div className="section-title">
@@ -150,8 +113,8 @@ const Home = () => {
             </div>
 
           </div>
-        </section>
-
+        </section> */}
+        {/* 
         <section id="skills" className="skills">
           <div className="container" data-aos="fade-up">
 
@@ -210,9 +173,9 @@ const Home = () => {
             </div>
 
           </div>
-        </section>
+        </section> */}
 
-        <section id="counts" className="counts">
+        {/* <section id="counts" className="counts">
           <div className="container" data-aos="fade-up">
 
             <div className="row">
@@ -252,9 +215,9 @@ const Home = () => {
             </div>
 
           </div>
-        </section>
+        </section> */}
 
-        <section id="clients" className="clients section-bg">
+        {/* <section id="clients" className="clients section-bg">
           <div className="container" data-aos="zoom-in">
 
             <div className="row">
@@ -286,9 +249,9 @@ const Home = () => {
             </div>
 
           </div>
-        </section>
+        </section> */}
 
-        <section id="services" className="services">
+        {/* <section id="services" className="services">
           <div className="container" data-aos="fade-up">
 
             <div className="section-title">
@@ -349,7 +312,7 @@ const Home = () => {
             </div>
 
           </div>
-        </section>
+        </section> */}
 
         {/* <!-- ======= Testimonials Section ======= --> */}
         <section id="testimonials" className="testimonials">

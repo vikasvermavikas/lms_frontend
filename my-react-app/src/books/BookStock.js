@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
 import "react-paginate/theme/basic/react-paginate.css";
+
 const BookStock = () => {
     const token = localStorage.getItem('TOKEN');
     const [nextbutton, setNextbutton] = useState('');
@@ -30,7 +31,7 @@ const BookStock = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         try {
-            axios.get('http://localhost:8082/books/stock/' + search, config)
+            axios.get(process.env.REACT_APP_SERVER_HOST+'books/stock/' + search, config)
                 .then(res => {
                     if (res.data.length === 0) {
                         setError({
@@ -58,7 +59,7 @@ const BookStock = () => {
     };
     const getstockdata = async () => {
         try {
-            await axios.get('http://localhost:8082/books/stock', config)
+            await axios.get(process.env.REACT_APP_SERVER_HOST+'books/stock', config)
                 .then(response => {
                     setData(response.data);
                     setSearch('');
@@ -131,6 +132,7 @@ const BookStock = () => {
                                 <th>Publish Year</th>
                                 <th>Total Books</th>
                                 <th>Assigned Books</th>
+                                <th>Books Available</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -143,6 +145,7 @@ const BookStock = () => {
                                     <td>{book.publish_year}</td>
                                     <td>{book.total_books}</td>
                                     <td>{book.assigned_books}</td>
+                                    <td>{book.total_books - book.assigned_books}</td>
                                 </tr>
                             ))}
                         </tbody>

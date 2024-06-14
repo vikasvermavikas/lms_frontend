@@ -57,12 +57,14 @@ const add_user = (req, res) => {
         if (err) {
             res.send(err);
         } else {
-            const html = `<b>Hi ${data.username}, </b> <p>Welcome to LMS,</p><p>You are successfully registered in LMS</p><p>Your Credentials are given below</p><p>Email id : ${data.email} </p><p>Password : ${data.password}</p><p>Thanks & Regards</p><p>Vikas Verma (CEO)</p>`;
+
+            const htmlmessage = `<b>Hi ${data.username}, </b> <p>Welcome to LMS,</p><p>You are successfully registered in LMS</p><p>Your Credentials are given below</p><p>Email id : ${data.email} </p><p>Password : ${data.password}</p><p>Thanks & Regards</p><p>Vikas Verma (CEO)</p>`;
+
             const mailOptions = {
                 from: 'noreply@gmail.com',
                 to: data.email,
                 subject: 'Credentials for login in LMS',
-                html: html
+                html: htmlmessage
             };
             // Verify connection configuration.
             transporter.verify(function (error, success) {
@@ -116,6 +118,75 @@ const updateprofile = async (req, res) => {
         }
     })
 };
+
+const get_total_users = (req, res) => {
+    Users.getTotalUsers(function (err, results) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(results);
+        }
+    })
+};
+const sendotp = (req, res) => {
+    const otp = Math.floor(1000 + Math.random() * 9000);  // Get 4 digit random number
+    const id = req.body.id;
+    const name = req.body.name;
+    const receivermail = req.body.to;
+    Users.sendotp(otp, id, function (err, results) {
+        if (err) {
+            res.send(err);
+        }
+        else {
+            const htmlmessage = `<b>Hi ${name}, </b> <p>Your OTP for update profile is : ${otp}</p><p>This OTP is valid for 1 minute.</p><p>Thanks & Regards</p><p>Vikas Verma (CEO)</p>`;
+
+            const mailOptions = {
+                from: 'noreply@gmail.com',
+                to: receivermail,
+                subject: 'OTP for update profile in LMS',
+                html: htmlmessage
+            };
+            // Verify connection configuration.
+            transporter.verify(function (error, success) {
+                if (error) {
+                    console.log('Connection error:', error);
+                } else {
+                    // Send the email
+                    transporter.sendMail(mailOptions, function (error, info) {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            res.send(results);
+                        }
+                    });
+                }
+            });
+        }
+    })
+
+};
+
+const validateOtp = (req, res) => {
+    const data = req.body;
+    Users.validateOtp(data, function (err, results) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(results);
+        }
+    });
+};
+
+const getallrecord = (req, res) => {
+    const data = req.body;
+    Users.getallrecord(data, function (err, results) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(results);
+        }
+    });
+};
 module.exports = {
     userlist,
     userdata,
@@ -124,5 +195,9 @@ module.exports = {
     add_user,
     search,
     is_valid,
-    updateprofile
+    updateprofile,
+    get_total_users,
+    sendotp,
+    validateOtp,
+    getallrecord
 };

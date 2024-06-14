@@ -15,33 +15,46 @@ const login = (req, res) => {
         if (err) {
             console.log(err);
         } else {
-            const userdata = result[0];
-            bcrypt.compare(req.body.password.toString(), result[0].password, (err, result) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    if (result) {
-                        req.session.userName = userdata.username;
-                        // Generate Token
-                        const token = jwt.sign({
-                            id: userdata.id,
-                            username: userdata.username,
-                            email: userdata.email,
-                        }, secretKey, {
-                            expiresIn: '1h'
-                        }, (err, token) => {
-                            return res.json({
-                                status: true,
-                                message: 'Login Success',
-                                data: userdata,
-                                token: token
-                            });
-                        });
+            if (result.length > 0) {
+                const userdata = result[0];
+                bcrypt.compare(req.body.password.toString(), result[0].password, (err, result) => {
+                    if (err) {
+                        console.log(err);
                     } else {
-                        return false;
+                       
+                        if (result) {
+                            req.session.userName = userdata.username;
+                            // Generate Token
+                            const token = jwt.sign({
+                                id: userdata.id,
+                                username: userdata.username,
+                                email: userdata.email,
+                                roleid: userdata.roleid,
+                            }, secretKey, {
+                                expiresIn: '1h'
+                            }, (err, token) => {
+                                return res.json({
+                                    status: true,
+                                    message: 'Login Success',
+                                    data: userdata,
+                                    token: token
+                                });
+                            });
+                        } else {
+                            return res.json({
+                                status: false,
+                                message: 'Invalid credentials, please try again',
+                            });
+                        }
                     }
-                }
-            });
+                });
+            }
+            else {
+                return res.json({
+                    status: false,
+                    message: 'Invalid credentials, please try again',
+                });
+            }
 
 
         }

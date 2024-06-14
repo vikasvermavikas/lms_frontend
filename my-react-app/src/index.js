@@ -6,9 +6,9 @@ import './index.css';
 // import Component1 from './App';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { name, age } from "./customfiles/person.js";
-import message from "./customfiles/message.js";
-import MyForm from './customfiles/form.js';
+// import { name, age } from "./customfiles/person.js";
+// import message from "./customfiles/message.js";
+// import MyForm from './customfiles/form.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 

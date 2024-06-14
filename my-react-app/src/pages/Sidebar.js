@@ -2,31 +2,45 @@ import { Outlet, Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 // import { ReactSession } from "react-client-session";
 import Footer from './Footer';
-
+import axios from "axios";
+import { dashboardUrl } from '../config/Constants';
 const Sidebar = () => {
     const navigate = useNavigate();
-    const [dashboardUrl, setDashboardUrl] = useState('');
+    const [users, setUsers] = useState([]);
     // Default set userdata.
     const [userdata, setUserdata] = useState({
-        username: '',
-        image: '',
-        roleid: '',
+        roleid: ''
     });
 
+    const getTopnotify = () => {
+        if (userdata && localStorage.getItem("TOKEN")) {
+            const token = localStorage.getItem("TOKEN");
+            const config = {
+                headers: {
+                    'authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            };
+            axios.get(process.env.REACT_APP_SERVER_HOST + 'get_top_notify', config)
+                .then((res) => {
+                    if (res.data.length > 0) {
+                        setUsers(res.data);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    };
     useEffect(() => {
         // Means if user is not logged in then redirect to the home page.
         if (!localStorage.getItem("TOKEN")) {
             navigate('/');
         }
         else {
-            // Set userdata.
             setUserdata(JSON.parse(localStorage.getItem("USER")));
-            if (userdata.roleid === 1) {
-                setDashboardUrl('/user/dashboard');
-            }
-            else {
-                setDashboardUrl('/guest/dashboard');
-            }
+            getTopnotify();
+
         }
     }, []);
 
@@ -35,7 +49,7 @@ const Sidebar = () => {
         <>
             <div id="wrapper">
                 <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-                    <Link to={dashboardUrl} className="sidebar-brand d-flex align-items-center justify-content-center">
+                    <Link to={dashboardUrl()} className="sidebar-brand d-flex align-items-center justify-content-center">
                         <div className="sidebar-brand-icon rotate-n-15">
                             <i className="fas fa-laugh-wink"></i>
                         </div>
@@ -47,7 +61,7 @@ const Sidebar = () => {
                     {/* <!-- Nav Item - Dashboard --> */}
                     <li className="nav-item active">
 
-                        <Link to={dashboardUrl} className="nav-link"> <i className="fas fa-fw fa-tachometer-alt"></i>
+                        <Link to={dashboardUrl()} className="nav-link"> <i className="fas fa-fw fa-tachometer-alt"></i>
                             <span>Dashboard</span> </Link>
                     </li>
 
@@ -63,13 +77,13 @@ const Sidebar = () => {
                             <a className="nav-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
                                 aria-expanded="true" aria-controls="collapseTwo">
                                 <i className="fas fa-fw fa-cog"></i>
-                                <span>Manage Users</span>
+                                <span>Manage Readers</span>
                             </a>
                             <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                                 <div className="bg-white py-2 collapse-inner rounded">
-                                    <h6 className="collapse-header">Users:</h6>
-                                    <Link to="/user/users" className="collapse-item">Users List</Link>
-                                    <Link to="/user/create" className="collapse-item">Add User</Link>
+                                    <h6 className="collapse-header">Readers:</h6>
+                                    <Link to="/user/users" className="collapse-item">Readers List</Link>
+                                    <Link to="/user/create" className="collapse-item">Add Reader</Link>
                                 </div>
                             </div>
                         </li>
@@ -87,23 +101,24 @@ const Sidebar = () => {
                                 </div>
                             </div>
                         </li>
-                        </>) : ''}
+                    </>) : ''}
                     {/* <!-- Nav Item - Pages Collapse Menu --> */}
 
                     <li className="nav-item">
-                            <a className="nav-link collapsed" data-toggle="collapse" data-target="#collapseFour"
-                                aria-expanded="true" aria-controls="collapseFour">
-                                <i className="fas fa-fw fa-cog"></i>
-                                <span>Assign Books</span>
-                            </a>
-                            <div id="collapseFour" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                <div className="bg-white py-2 collapse-inner rounded">
-                                    <h6 className="collapse-header">Books</h6>
-                                    <Link to={userdata.roleid === 1 ? '/book/assignments' : '/guest/assignments'} className="collapse-item">Assignments</Link>
-                                    <Link to="/book/stock" className="collapse-item">Stock</Link>
-                                </div>
+                        <a className="nav-link collapsed" data-toggle="collapse" data-target="#collapseFour"
+                            aria-expanded="true" aria-controls="collapseFour">
+                            <i className="fas fa-fw fa-cog"></i>
+                            <span>Assign Books</span>
+                        </a>
+                        <div id="collapseFour" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div className="bg-white py-2 collapse-inner rounded">
+                                <h6 className="collapse-header">Books</h6>
+                                <Link to={userdata.roleid === 1 ? '/book/assignments' : '/guest/assignments'} className="collapse-item">Assignments</Link>
+                                <Link to={userdata.roleid === 1 ? '/book/stock' : '/guest/book/stock'} className="collapse-item">Stock</Link>
+
                             </div>
-                        </li>
+                        </div>
+                    </li>
                 </ul>
 
 
@@ -117,46 +132,9 @@ const Sidebar = () => {
                                 <i className="fa fa-bars"></i>
                             </button>
 
-                            {/* <!-- Topbar Search --> */}
-                            {/* <form
-                                className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                                <div className="input-group">
-                                    <input type="text" className="form-control bg-light border-0 small" placeholder="Search for..."
-                                        aria-label="Search" aria-describedby="basic-addon2" />
-                                    <div className="input-group-append">
-                                        <button className="btn btn-primary" type="button">
-                                            <i className="fas fa-search fa-sm"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form> */}
-
                             {/* <!-- Topbar Navbar --> */}
                             <ul className="navbar-nav ml-auto">
 
-                                {/* <!-- Nav Item - Search Dropdown (Visible Only XS) --> */}
-                                <li className="nav-item dropdown no-arrow d-sm-none">
-                                    <a className="nav-link dropdown-toggle" id="searchDropdown" role="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i className="fas fa-search fa-fw"></i>
-                                    </a>
-                                    {/* <!-- Dropdown - Messages --> */}
-                                    <div className="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                        aria-labelledby="searchDropdown">
-                                        <form className="form-inline mr-auto w-100 navbar-search">
-                                            <div className="input-group">
-                                                <input type="text" className="form-control bg-light border-0 small"
-                                                    placeholder="Search for..." aria-label="Search"
-                                                    aria-describedby="basic-addon2" />
-                                                <div className="input-group-append">
-                                                    <button className="btn btn-primary" type="button">
-                                                        <i className="fas fa-search fa-sm"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </li>
 
                                 {/* <!-- Nav Item - Alerts --> */}
                                 <li className="nav-item dropdown no-arrow mx-1">
@@ -164,52 +142,30 @@ const Sidebar = () => {
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i className="fas fa-bell fa-fw"></i>
                                         {/* <!-- Counter - Alerts --> */}
-                                        <span className="badge badge-danger badge-counter">3+</span>
+                                        <span className="badge badge-danger badge-counter">{users.length}</span>
                                     </a>
                                     {/* <!-- Dropdown - Alerts --> */}
                                     <div className="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                         aria-labelledby="alertsDropdown">
                                         <h6 className="dropdown-header">
-                                            Alerts Center
+                                            Notifications
                                         </h6>
-                                        <a className="dropdown-item d-flex align-items-center">
-                                            <div className="mr-3">
-                                                <div className="icon-circle bg-primary">
-                                                    <i className="fas fa-file-alt text-white"></i>
+                                        {users.map((user, index) => (
+                                            <div className="dropdown-item d-flex align-items-center" key={index}>
+                                                <div className="mr-3">
+                                                    <div className="icon-circle bg-primary">
+                                                        <i className="fas fa-file-alt text-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div className="text">
+                                                    <span className="font-weight-bold">{user.name} subscription closed soon.</span>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className="small text-gray-500">December 12, 2019</div>
-                                                <span className="font-weight-bold">A new monthly report is ready to download!</span>
-                                            </div>
-                                        </a>
-                                        <a className="dropdown-item d-flex align-items-center">
-                                            <div className="mr-3">
-                                                <div className="icon-circle bg-success">
-                                                    <i className="fas fa-donate text-white"></i>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div className="small text-gray-500">December 7, 2019</div>
-                                                $290.29 has been deposited into your account!
-                                            </div>
-                                        </a>
-                                        <a className="dropdown-item d-flex align-items-center">
-                                            <div className="mr-3">
-                                                <div className="icon-circle bg-warning">
-                                                    <i className="fas fa-exclamation-triangle text-white"></i>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div className="small text-gray-500">December 2, 2019</div>
-                                                Spending Alert: We've noticed unusually high spending for your account.
-                                            </div>
-                                        </a>
-                                        <a className="dropdown-item text-center small text-gray-500">Show All Alerts</a>
+                                        ))}
+
+                                        <Link to='/user/all_notifications' className="dropdown-item text-center small text-gray-500">Show All Notifications</Link>
                                     </div>
                                 </li>
-
-
 
                                 <div className="topbar-divider d-none d-sm-block"></div>
 
@@ -219,7 +175,7 @@ const Sidebar = () => {
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span className="mr-2 d-none d-lg-inline text-gray-600 small">{userdata.username ? userdata.username : ''}</span>
                                         <img className="img-profile rounded-circle"
-                                            src={`http://localhost:8082/${userdata.image}`} />
+                                            src={process.env.REACT_APP_SERVER_HOST + `${userdata.image}`} />
                                     </a>
                                     {/* <!-- Dropdown - User Information --> */}
                                     <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in"

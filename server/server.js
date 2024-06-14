@@ -13,6 +13,7 @@ const userController = require('./controllers/userController');
 const auth = require('./controllers/authController');
 const booksController = require('./controllers/bookController');
 const guestController = require('./controllers/guestController');
+const notifyController = require('./controllers/notifyController');
 
 const app = express();
 app.use(session({ secret: 'Your_Secret_Key', resave: false, saveUninitialized: true }));
@@ -42,10 +43,10 @@ async function verifytoken(req, res, next) {
     if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
         jwt.verify(req.headers.authorization.split(' ')[1], secretKey, async (err, decode) => {
             if (err) {
-                console.log(err);
                 return res.status(401).send('Unauthorized user');
             } else {
                 req.userId = decode.id;
+                req.roleId = decode.roleid;
                 const isValid = await userController.is_valid(decode.id);
                 if (!isValid) {
                     return res.status(401).send('Unauthorized user');
@@ -74,6 +75,11 @@ app.get('/books/assignment_detail/:id', verifytoken, booksController.get_assignm
 app.get('/books/is_assign/:id', verifytoken, booksController.is_assign);
 app.put('/books/bookreturn/:id', verifytoken, booksController.book_return);
 app.get('/books/stock/:search?', verifytoken, booksController.get_book_stock);
+app.get('/books/total/categories', verifytoken, booksController.get_total_books);
+app.get('/books/total/assignments', verifytoken, booksController.get_total_assignments);
+app.get('/books/total/pending_assignments', verifytoken, booksController.get_total_pending_assign);
+app.get('/books/getthreshold', verifytoken, booksController.get_book_threshold);
+app.post('/books/updateThreshold', verifytoken, booksController.update_book_threshold);
 
 
 // ************** Manage Users **************
@@ -91,7 +97,14 @@ app.post('/login', auth.login);
 // Do Logout.
 app.post('/logout', auth.logout);
 
+// Get top notifications.
+app.get('/get_top_notify', verifytoken, notifyController.get_notify);
 
+// Get all notifications.
+app.get('/user/getNotification', verifytoken, notifyController.get_all_notify);
+
+// Get notifications count.
+app.get('/user/notifications/count', verifytoken, notifyController.get_notify_count);
 
 // ************** Manage Users **************
 // Get Users.
@@ -107,10 +120,22 @@ app.get('/read/:id', verifytoken, userController.userdata);
 app.put('/update/:id', verifytoken, userController.update_user);
 
 // Delete user.
-app.delete('/delete/:id', verifytoken, userController.delete_user)
+app.delete('/delete/:id', verifytoken, userController.delete_user);
+
+// Get total users.
+app.get('/users/count', verifytoken, userController.get_total_users);
 
 // Search user.
 app.get('/user', verifytoken, userController.search);
+
+// Send otp.
+app.post('/user/sendmail', verifytoken, userController.sendotp);
+
+// Send otp.
+app.post('/user/getallrecord', verifytoken, userController.getallrecord);
+
+// Validate otp.
+app.post('/user/validateOtp', verifytoken, userController.validateOtp);
 
 app.put('/user/updateprofile/:id', verifytoken, upload.single('image'), userController.updateprofile);
 // ************** End Manage users ************

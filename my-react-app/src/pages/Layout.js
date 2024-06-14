@@ -40,8 +40,7 @@ const Layout = (props) => {
 
         //   </header>
         // </nav>
-
-        <div>
+          <>
           <head>
             <link href={process.env.PUBLIC_URL + "assets/img/favicon.png"} rel="icon" />
             <link href={process.env.PUBLIC_URL + "assets/img/apple-touch-icon.png"} rel="apple-touch-icon" />
@@ -53,6 +52,7 @@ const Layout = (props) => {
             <link href={process.env.PUBLIC_URL + "assets/vendor/swiper/swiper-bundle.min.css"} rel="stylesheet" />
             <link href={process.env.PUBLIC_URL + "/assets2/css/style.css"} rel="stylesheet"></link>
           </head>
+        <div>
           <section id="topbar" className="d-flex align-items-center">
             <div className="container d-flex justify-content-center justify-content-md-between">
               <div className="contact-info d-flex align-items-center">
@@ -86,6 +86,7 @@ const Layout = (props) => {
             </div>
           </header>
         </div>
+        </>
       )}
 
       <Outlet />
