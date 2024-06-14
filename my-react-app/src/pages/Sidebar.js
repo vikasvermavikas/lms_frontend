@@ -1,12 +1,48 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 // import { ReactSession } from "react-client-session";
+import { toast, ToastContainer, Slide } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ConfirmToast } from 'react-confirm-toast';
+import "react-paginate/theme/basic/react-paginate.css";
+
+
 import Footer from './Footer';
 import axios from "axios";
 import { dashboardUrl } from '../config/Constants';
 const Sidebar = () => {
+
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
+    const [show, setShow] = useState(false);
+    const [values, setValues] = useState({
+        userid: JSON.parse(localStorage.getItem("USER")).id
+    });
+
+    const [error, setError] = useState({
+        message: ""
+    });
+
+    const handleLogout = (event) => {
+        // event.preventDefault();
+        axios.post(process.env.REACT_APP_SERVER_HOST + "logout", values)
+            .then(res => {
+                if (res.data.status) {
+                    sessionStorage.clear();
+                    localStorage.clear();
+                    navigate('/login');
+                }
+                else {
+                    setError({
+                        message: res.data.message
+                    });
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+
     // Default set userdata.
     const [userdata, setUserdata] = useState({
         roleid: ''
@@ -33,6 +69,8 @@ const Sidebar = () => {
         }
     };
     useEffect(() => {
+        document.title = "Logout";
+
         // Means if user is not logged in then redirect to the home page.
         if (!localStorage.getItem("TOKEN")) {
             navigate('/');
@@ -44,9 +82,23 @@ const Sidebar = () => {
         }
     }, []);
 
+    const handleLogout1 = () => {
+        setShow(true);
+    };
 
     return (
         <>
+            <ConfirmToast
+                asModal={true}
+                buttonYesText={'Confirm'}
+                customFunction={() => handleLogout()}
+                setShowConfirmToast={setShow}
+                showConfirmToast={show}
+                toastText='Do you want logout ?'
+                theme={'snow'}
+            />
+            <ToastContainer transition={Slide} />
+
             <div id="wrapper">
                 <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
                     <Link to={dashboardUrl()} className="sidebar-brand d-flex align-items-center justify-content-center">
@@ -123,7 +175,6 @@ const Sidebar = () => {
 
 
                 <div id="content-wrapper" className="d-flex flex-column">
-
                     <div id="content">
                         <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
@@ -193,8 +244,14 @@ const Sidebar = () => {
                                         </a>
                                         <div className="dropdown-divider"></div>
 
-                                        <Link to="/user/logout" className="dropdown-item"><i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Logout</Link>
+                                        {/* <Link to="/user/logout" className="dropdown-item"><i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Logout</Link> */}
 
+
+
+                                        <a className="dropdown-item">
+                                            <i className="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                            <span onClick={() => handleLogout1()}>Logout</span>
+                                        </a>
                                     </div>
                                 </li>
 
