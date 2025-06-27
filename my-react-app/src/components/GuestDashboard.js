@@ -19,9 +19,9 @@ const GuestDashboard = () => {
             const response = await axios.get(process.env.REACT_APP_SERVER_HOST + 'books/total/assignments', config);
             if (response.data.length > 0) {
                 setAssignments(response.data[0].total_assignments);
-                setError({
-                    server: ''
-                });
+                // setError({
+                //     server: ''
+                // });
             }
         } catch (error) {
             setError({
@@ -45,7 +45,10 @@ const GuestDashboard = () => {
 
     const getNotificationCount = async () => {
         try {
-            const response = await axios.get(process.env.REACT_APP_SERVER_HOST + 'user/notifications/count');
+            const response = await axios.get(process.env.REACT_APP_SERVER_HOST + 'user/notifications/count', config);
+            if (response.status === 200) {
+                setMesagges(response.data.count);
+            }
         } catch (error) {
             setError({
                 server: error.message

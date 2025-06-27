@@ -94,7 +94,7 @@ Users.findAll = (cb) => {
 };
 
 Users.findById = (id, cb) => {
-    const sql = 'SELECT id, username, first_name, last_name, email, gender, image, aadhar, mobile, timecreated, library_id, subscription_days, subscription_amount, payment_mode FROM users WHERE id =?';
+    const sql = 'SELECT id, username, first_name, last_name, email, gender, image, aadhar, mobile, timecreated, library_id, subscription_days, subscription_amount, payment_mode, subscription_end_date FROM users WHERE id =?';
     connection.query(sql, [id], (err, result) => {
         if (err) {
             cb(err, null);
@@ -125,7 +125,7 @@ Users.delete = (id, cb) => {
 
 
 Users.search = (searchvalue, cb) => {
-    const sql = 'SELECT id, library_id, first_name, last_name, email FROM users WHERE first_name LIKE ? OR last_name LIKE ? OR email LIKE ?';
+    const sql = 'SELECT id, library_id, first_name, last_name, email, subscription_days, timecreated, subscription_end_date FROM users WHERE first_name LIKE ? OR last_name LIKE ? OR email LIKE ?';
     const searchPattern = `%${searchvalue}%`;
 
     connection.query(sql, [searchPattern, searchPattern, searchPattern], (err, result) => {
@@ -192,7 +192,7 @@ Users.sendotp = (otp, id, cb) => {
     const values = [
         otp,
         Math.floor(Date.now() / 1000),  // seconds
-        Math.floor(Date.now() / 1000) + 60,   // time after 1 minute
+        Math.floor(Date.now() / 1000) + 300,   // time after 5 minute
         id,
         0,
         0
@@ -253,7 +253,7 @@ Users.validateOtp = (data, cb) => {
 // Get user record by library id.
 Users.getallrecord = (data, cb) => {
     const libraryid = data.libraryid;
-    const sql = 'SELECT u.id, u.username, u.first_name, u.last_name, u.email, u.gender, u.mobile, u.aadhar, u.library_id, u.timecreated, u.subscription_amount, u.subscription_days, u.payment_mode FROM users u  WHERE u.library_id =?';
+    const sql = 'SELECT u.id, u.username, u.first_name, u.last_name, u.email, u.gender, u.mobile, u.aadhar, u.library_id, u.timecreated, u.subscription_amount, u.subscription_days, u.payment_mode, u.subscription_end_date FROM users u  WHERE u.library_id =?';
     connection.query(sql, [libraryid], (err, result) => {
         if (err) {
             cb(err, null);

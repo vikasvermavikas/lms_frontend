@@ -4,7 +4,7 @@ const Footer = () => {
             <footer className="sticky-footer bg-white">
                 <div className="container my-auto">
                     <div className="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2024</span>
+                        <span>© 2024 All Rights Reserved by Vikas. Design & Developed by Vikas Verma Software Solutions Pvt Ltd</span>
                     </div>
                 </div>
             </footer>

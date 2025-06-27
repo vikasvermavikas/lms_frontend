@@ -124,7 +124,7 @@ const Sidebar = () => {
                     <div className="sidebar-heading">
                         Interface
                     </div>
-                    {userdata.roleid === 1 ? (<>
+                    {userdata.roleid === 1 && <>
                         <li className="nav-item">
                             <a className="nav-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
                                 aria-expanded="true" aria-controls="collapseTwo">
@@ -136,6 +136,20 @@ const Sidebar = () => {
                                     <h6 className="collapse-header">Readers:</h6>
                                     <Link to="/user/users" className="collapse-item">Readers List</Link>
                                     <Link to="/user/create" className="collapse-item">Add Reader</Link>
+                                </div>
+                            </div>
+                        </li>
+                        <li className="nav-item">
+                            <a className="nav-link collapsed" data-toggle="collapse" data-target="#collapseOne"
+                                aria-expanded="true" aria-controls="collapseOne">
+                                <i className="fas fa-fw fa-cog"></i>
+                                <span>Manage Subscriptions</span>
+                            </a>
+                            <div id="collapseOne" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                <div className="bg-white py-2 collapse-inner rounded">
+                                    <h6 className="collapse-header">Subscription:</h6>
+                                    <Link to="/subscription/list" className="collapse-item">Subscriptions List</Link>
+                                    <Link to="/subscription/create" className="collapse-item">Add Subscription</Link>
                                 </div>
                             </div>
                         </li>
@@ -153,7 +167,7 @@ const Sidebar = () => {
                                 </div>
                             </div>
                         </li>
-                    </>) : ''}
+                    </>}
                     {/* <!-- Nav Item - Pages Collapse Menu --> */}
 
                     <li className="nav-item">

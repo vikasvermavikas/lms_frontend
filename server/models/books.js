@@ -94,7 +94,7 @@ class books {
 
     static assign = (data, cb) => {
         // First check subscription is end or not.
-        const getuser = 'SELECT subscription_days, timecreated FROM users WHERE id = ?';
+        const getuser = 'SELECT subscription_days, timecreated, subscription_end_date FROM users WHERE id = ?';
         connection.query(getuser, [data.userid], (err, usergot) => {
             if (err) {
                 cb(err, null);
@@ -102,9 +102,11 @@ class books {
             else if (usergot.length > 0) {
                 const currentdate = Date.now(); // current date in milliseconds.
                 const subscription_date = new Date(usergot[0].timecreated * 1000); // subscription date in milliseconds.
-                const daysleft = usergot[0].subscription_days - (Math.floor((currentdate - subscription_date) / (1000 * 3600 * 24))) - 1; // days left.
+                // const daysleft = usergot[0].subscription_days - (Math.floor((currentdate - subscription_date) / (1000 * 3600 * 24))) - 1; // days left.
+                const daysleft = usergot[0].subscription_end_date - (Math.floor((currentdate) / (1000))); // time left in seconds.
+                // console.log(daysleft);
 
-                // Still reader have pending days.
+                // Still reader have pending time.
                 if (daysleft > 0) {
                     const getbook = 'SELECT book_name, publisher_name, class, publish_year FROM books WHERE id = ?';
                     connection.query(getbook, [data.book_id], (err, result) => {

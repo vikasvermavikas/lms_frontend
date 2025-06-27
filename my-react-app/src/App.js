@@ -44,6 +44,10 @@ import SearchBooks from './users/guest/SearchBooks';
 import GuestAuth from './components/auth/GuestAuth';
 import PublicAuth from './components/auth/PublicAuth';
 
+import Subscriptions from './components/subscriptions/Subscriptions';
+import SubscriptionCreate from './components/subscriptions/SubscriptionCreate';
+import SubscriptionEdit from './components/subscriptions/SubscriptionEdit';
+
 
 // const UserContext = createContext()
 function App() {
@@ -98,6 +102,14 @@ function App() {
           <Route path="book/view/:id" element={<GuestAuth><AssignmentView /></GuestAuth>} />
           <Route path="book/stock" element={<GuestAuth><SearchBooks /></GuestAuth>} />
         </Route>
+
+        <Route path="/subscription/" element={<Sidebar />}>
+          <Route path="list" element={<RequireAuth><Subscriptions /></RequireAuth>} />
+          <Route path="create" element={<RequireAuth><SubscriptionCreate /></RequireAuth>} />
+          <Route path="edit/:id" element={<RequireAuth><SubscriptionEdit /></RequireAuth>} />
+        </Route>
+
+
         <Route path="*" element={<NoPage todos={todos} />} />
         {/* </Route> */}
       </Routes>

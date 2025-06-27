@@ -26,7 +26,7 @@ const Read = () => {
         html2canvas(inputRef.current, { useCORS: true }).then((canvas) => {
             const imgData = canvas.toDataURL("image/png");
             const pdf = new jsPDF();
-            pdf.addImage(imgData, "JPEG", 0, 0);
+            pdf.addImage(imgData, "JPEG", 0, 0, 100, 50);
             pdf.save("library_card.pdf");
         });
     };
@@ -55,7 +55,12 @@ const Read = () => {
                 <Link to={`/user/edit/${user.id}`} className="btn btn-info float-right">Edit</Link>
                 <div className="row">
                     <div className="col-md-6 text-center mt-5">
-                        <figure><img src={process.env.REACT_APP_SERVER_HOST+`${user.image}`} alt="no-image-found" className="img-fluid w-50 rounded border" /> </figure>
+                        <figure>
+                            {/* <img src={process.env.REACT_APP_SERVER_HOST+`${user.image}`} alt="no-image-found" className="img-fluid w-50 rounded border" />  */}
+                            {user.image ?  
+                            <img src={process.env.REACT_APP_SERVER_HOST+`${user.image}`} alt="no-image-found" className="img-fluid h-100 rounded border" style={{ 'width': '40%' }} /> :
+                            <img src={user.gender == 'female' ? process.env.PUBLIC_URL+`/assets/img/default-image-female.png` : process.env.PUBLIC_URL+`/assets/img/default-image-male.png`} alt="no-image-found" className="img-fluid rounded border" style={{ 'width': '40%' }} />}
+                            </figure>
                     </div>
                     <div className="p-2 col-md-6">
                         <div className="row">
@@ -82,6 +87,9 @@ const Read = () => {
                                 <p className="text-capitalize">Subscription Start Date :-  {new Date(user.timecreated * 1000).toLocaleDateString()}</p>
                             </div>
                             <div className="col-md-6">
+                                <p className="text-capitalize">Subscription End Date :-  {new Date(user.subscription_end_date * 1000).toLocaleDateString()}</p>
+                            </div>
+                            <div className="col-md-6">
                           
                                 <p className="text-capitalize">Subscription Paid Amount :- INR {user.subscription_amount}.00</p>
                             </div>
@@ -93,23 +101,29 @@ const Read = () => {
                                 <div className="container card" ref={inputRef} style={{ "backgroundColor": "cornflowerblue", "color": "white" }}>
                                     <div className="card-body" >
                                         <div className="row">
-                                            <div className="col-sm-3 border border-white rounded-circle text-center">
+                                             <div className="col-sm-3 border rounded-circle image-circle text-center">
                                                 <span className=""> LMS </span>
+                                                {/* <img src={`${process.env.PUBLIC_URL}/assets/img/library_logo.png`} className="img-fluid" /> */}
                                             </div>
                                             <div className="col-sm-9">
-                                                <h4>Library Management System</h4>
+                                                <h4>Membership Card</h4>
                                             </div>
                                             <hr className="mt-2"></hr>
-                                            <div className="text-center mb-2">
+                                            {/* <div className="text-center mb-2">
                                                 <span>Membership Card</span>
-                                            </div>
-                                            <div className="col-md-12" style={{ marginLeft: '20%' }}>
+                                            </div> */}
+                                            {/* <div className="col-md-12" style={{ marginLeft: '20%' }}>
 
-                                            </div>
-                                            <div className="col-sm-8 d-flex">
-                                                <img src={process.env.REACT_APP_SERVER_HOST+`${user.image}`} alt="no-image-found" className="img-fluid h-75 rounded border" style={{ 'width': '40%' }} />
+                                            </div> */}
+                                            <div className="d-flex">
+                                            <div className="col-sm-8 d-flex h-100">
+                                                {user.image ?  
+                                                <img src={process.env.REACT_APP_SERVER_HOST+`${user.image}`} alt="no-image-found" className="img-fluid h-100 rounded border" style={{ 'width': '40%' }} /> :
+                                                 <img src={user.gender == 'female' ? process.env.PUBLIC_URL+`/assets/img/default-image-female.png` : process.env.PUBLIC_URL+`/assets/img/default-image-male.png`} alt="no-image-found" className="img-fluid rounded border" style={{ 'width': '40%' }} />}
+                                               
+
                                                 <div className="ml-2">
-                                                    <h4 className="text-capitalize">{user.first_name + " " + user.last_name}</h4>
+                                                    <h6 className="text-capitalize">{user.first_name + " " + user.last_name}</h6>
                                                     <span className="small">{"Library Id:" + "    " + user.library_id}</span><br></br>
                                                     <span className="small">{"Contact No: " + user.mobile}</span><br></br>
                                                     <span className="small">Issue Date: {new Date(user.timecreated * 1000).toLocaleDateString()}</span>
@@ -117,20 +131,22 @@ const Read = () => {
                                             </div>
 
                                             <div className="col-sm-4">
-                                                <p className="mt-2 ml-5">
+                                                <p className="ml-5">
                                                     <QRCode
-                                                        size={256}
-                                                        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                                                    className="img-responsive"
+                                                        size={100}
+                                                        // style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                                                         value={"/user/details/" + user.library_id}
-                                                        viewBox={`0 0 256 256`}
+                                                        viewBox={`-10 -10 68 68`}
 
                                                     />
                                                 </p>
 
-                                                <div className="float-right text-center">
+                                                {/* <div className="float-right text-center">
                                                     <span className="card-text">Authorised By</span><br></br>
                                                     <span className="card-text">Vikas Verma</span>
-                                                </div>
+                                                </div> */}
+                                            </div>
                                             </div>
 
                                         </div>
@@ -140,7 +156,7 @@ const Read = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-md-12 text-right">
+                                <div className="col-md-12 text-right mt-2">
                                     <button className="btn btn-primary" onClick={printDocument}>Download</button>
                                 </div>
                             </div>

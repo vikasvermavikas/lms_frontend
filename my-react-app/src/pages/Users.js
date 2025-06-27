@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer, Slide } from "react-toastify";
@@ -6,13 +6,18 @@ import "react-toastify/dist/ReactToastify.css";
 import { ConfirmToast } from 'react-confirm-toast';
 import ReactPaginate from 'react-paginate';
 import "react-paginate/theme/basic/react-paginate.css";
+import { DownloadTableExcel, downloadExcel } from 'react-export-table-to-excel';
+
 const Users = () => {
+    const tableRef = useRef(null);
     const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
     const [error, setError] = useState({
         search: '',
         list: '',
     });
+    const header = ["Id", "First Name", "Last Name", "Email", "Username", "Library Id", "Subscription Days", "Subscription Expire Date", "Registration Date"];
+
     const token = localStorage.getItem('TOKEN');
     const handlechange = (event) => {
         setSearch(event.target.value)
@@ -108,7 +113,34 @@ const Users = () => {
         const newOffset = (event.selected * itemperpage) % data.length;
         setItemOffset(newOffset);
     };
+    // Download excel for all data.
+    const handleDownloadExcel = () => {
 
+        // Function to convert Unix timestamp to date string.
+        const convertTimestampToDate = (timestamp) => {
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString(); // Format date as needed
+        };
+
+        // Transform Unix timestamp to date string for all columns.
+        const transformedData = data.map((row) => {
+            return {
+                ...row,
+                subscription_end_date: convertTimestampToDate(row.subscription_end_date),
+                timecreated: convertTimestampToDate(row.timecreated),
+            };
+        });
+
+        // Here real download code is run.
+        downloadExcel({
+            fileName: "users",
+            sheet: "users",
+            tablePayload: {
+                header,
+                body: transformedData,
+            },
+        });
+    }
     // end Code for pagination.
 
     return (
@@ -127,6 +159,7 @@ const Users = () => {
                 <ToastContainer transition={Slide} />
 
                 <div className="row">
+
                     <div className="col-md-12">
                         <h2>
                             Readers List
@@ -134,7 +167,9 @@ const Users = () => {
                         <h5> Total Readers : {data.length} </h5>
                         <div className="d-flex justify-content-end">
                             <Link to="/user/qrSearch" className="btn btn-primary mr-2">Search By QR</Link>
-                            <Link to="/user/create" className="btn btn-success">Create +</Link>
+                            <Link to="/user/create" className="btn btn-success mr-2">Create +</Link>
+                            <button className="btn btn-info" onClick={handleDownloadExcel}>Download Excel</button>
+
                         </div>
                     </div>
                     {error.search ? (<span className="alert alert-danger" role="alert">{error.search}</span>) : ''}
@@ -153,10 +188,21 @@ const Users = () => {
                             </div>
                         </form>
                     </div>
+                    {/* <DownloadTableExcel
+                        filename="users table"
+                        sheet="users"
+                        // currentTableRef={tableRef.current}
+                        tablePayload={
+                            header,
+                            // accept two different data structures
+                            body
+                          }
+                    ><button className="float-right btn btn-success"> Export excel </button></DownloadTableExcel> */}
+
                 </div>
 
                 <div className="table-responsive">
-                    <table className="table text-center">
+                    <table className="table text-center" ref={tableRef}>
                         <thead>
                             <tr>
                                 <th>Libary Id</th>
@@ -164,32 +210,33 @@ const Users = () => {
                                 <th>Last Name</th>
                                 <th>Email</th>
                                 <th>Subscription</th>
-                                <th>Pending Days</th>
+                                <th>Subscription Expire Date</th>
+                                {/* <th>Pending Days</th> */}
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {currentItems.map((user, index) => {
-                                var currentdate = Date.now(); // current date in milliseconds.
-                                var subscription_end_date = new Date(user.subscription_end_date * 1000); // subscription date in milliseconds.
-                                var daysleft = (Math.floor((subscription_end_date - currentdate) / (1000 * 3600 * 24))); // days left.
-                                if (daysleft > 0) {
-                                    var showleft = '-' + daysleft + ' days';
-                                }
-                                else if (daysleft == 0) {
-                                    var showleft = 'Suscription Expired Today';
-                                }
-                                else {
-                                    var showleft = 'Suscription Expired';
-
-                                }
+                                // var currentdate = Date.now(); // current date in milliseconds.
+                                // var subscription_end_date = new Date(user.subscription_end_date * 1000); // subscription date in milliseconds.
+                                // var daysleft = (Math.floor((subscription_end_date - currentdate) / (1000 * 3600 * 24))); // days left.
+                                // if (daysleft > 0) {
+                                //     var showleft = '-' + daysleft + ' days';
+                                // }
+                                // else if (daysleft == 0) {
+                                //     var showleft = 'Suscription Expired Today';
+                                // }
+                                // else {
+                                //     var showleft = 'Suscription Expired';
+                                // }
                                 return (<tr key={index}>
                                     <td>{user.library_id}</td>
                                     <td>{user.first_name}</td>
                                     <td>{user.last_name}</td>
                                     <td className="text-wrap">{user.email}</td>
                                     <td>{user.subscription_days} days</td>
-                                    <td className="text-danger">{showleft}</td>
+                                    <td className="text-danger">{new Date(Math.floor(user.subscription_end_date * 1000)).toLocaleDateString()}</td>
+                                    {/* <td className="text-danger">{showleft}</td> */}
                                     <td>
                                         <div className="">
                                             <Link to={`/user/read/${user.id}`} className="btn btn-sm btn-primary ml-1 mt-1">View</Link>

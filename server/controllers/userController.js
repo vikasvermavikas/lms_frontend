@@ -138,7 +138,7 @@ const sendotp = (req, res) => {
             res.send(err);
         }
         else {
-            const htmlmessage = `<b>Hi ${name}, </b> <p>Your OTP for update profile is : ${otp}</p><p>This OTP is valid for 1 minute.</p><p>Thanks & Regards</p><p>Vikas Verma (CEO)</p>`;
+            const htmlmessage = `<b>Hi ${name}, </b> <p>Your OTP for update profile is : ${otp}</p><p>This OTP is valid for 5 minutes.</p><p>Thanks & Regards</p><p>Vikas Verma (CEO)</p>`;
 
             const mailOptions = {
                 from: 'noreply@gmail.com',

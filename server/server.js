@@ -14,6 +14,7 @@ const auth = require('./controllers/authController');
 const booksController = require('./controllers/bookController');
 const guestController = require('./controllers/guestController');
 const notifyController = require('./controllers/notifyController');
+const subscriptionController = require('./controllers/subscriptionController');
 
 const app = express();
 app.use(session({ secret: 'Your_Secret_Key', resave: false, saveUninitialized: true }));
@@ -143,7 +144,17 @@ app.put('/user/updateprofile/:id', verifytoken, upload.single('image'), userCont
 // ************** Guest routes ****************
 app.post('/guest/assignments/:search?', verifytoken, guestController.guestAssignments);
 app.post('/guest/book/view', verifytoken, guestController.guestBookView);
+// ************** End Guest Routes ************
 
+
+// ************** Manage Subscription **************
+app.post('/addSubscription', verifytoken, subscriptionController.add_subscription);
+app.get('/getSubscriptions', verifytoken, subscriptionController.get_all_subscriptions);
+app.post('/get_subscription', verifytoken, subscriptionController.get_subscription);
+app.put('/update_subscription', verifytoken, subscriptionController.update_subscription);
+app.delete('/subscription/delete/:id', verifytoken, subscriptionController.delete_subscription);
+
+// ************** End Manage subcription **************
 // Listen for changes.
 app.listen(8082, () => {
     console.log('Server is running on port 8082');

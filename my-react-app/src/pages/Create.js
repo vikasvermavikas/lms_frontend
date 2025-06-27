@@ -8,6 +8,10 @@ import Validation from '../components/UserValidation';
 const Create = () => {
     const token = localStorage.getItem("TOKEN");
     const [validationerror, setValidationerror] = useState('');
+    const [subscriptions, setSubscriptions] = useState([]);
+    const [subscriptionAmount, setSubscriptionAmount] = useState(0);
+    const [staticSubscription, setStaticSubscription] = useState(0);
+
     const [error, setError] = useState({
         server: '',
         email: '',
@@ -33,15 +37,83 @@ const Create = () => {
         subscription_amount: '',
         payment_mode: '',
     });
-
+    const get_subscriptions = async () => {
+        try {
+            const response = await axios.get(process.env.REACT_APP_SERVER_HOST + 'getSubscriptions', config);
+            if (response.status === 200 && response.data.data.success) {
+                setSubscriptions(response.data.data.data);
+            }
+            else {
+                setError({
+                    server: response.message
+                });
+            }
+        } catch (error) {
+            setError({
+                server: error.message
+            });
+        }
+    };
     useEffect(() => {
         document.title = "Create User";
+        get_subscriptions();
     }, []);
     const navigate = useNavigate();
     const config = {
         headers: {
             'Content-Type': 'application/json',
             'authorization': `Bearer ${token}`
+        }
+    };
+
+
+    const get_subscription_amount = async (id) => {
+        const valuestosent = {
+            id: id
+        };
+        try {
+            const response = await axios.post(process.env.REACT_APP_SERVER_HOST + 'get_subscription', valuestosent, config);
+            if (response.status === 200 && response.data.data.success) {
+                const amount = response.data.data.data[0].amount_specify;
+                setSubscriptionAmount(amount);
+                setStaticSubscription(amount);
+                setValues({
+                    ...values, subscription_amount: subscriptionAmount,
+                    subscription_days: response.data.data.data[0].subscription_months * 30,
+                });
+            }
+
+        }
+        catch (error) {
+            setError({
+                server: error.message
+            });
+        }
+    };
+    const setPackage = (e) => {
+        get_subscription_amount(e.target.value);
+    };
+
+    const setDiscount = (e) => {
+        const discount = e.target.value;
+        if (discount > 0 && discount < 101) {
+
+            setSubscriptionAmount((prevAmount) => {
+                const newAmount = staticSubscription - (staticSubscription * (discount / 100));
+                setValues({
+                    ...values,
+                    subscription_amount: newAmount
+                });
+                return newAmount;
+            });
+
+        }
+        else {
+            setSubscriptionAmount(staticSubscription);
+            setValues({
+                ...values,
+                subscription_amount: staticSubscription
+            });
         }
     };
 
@@ -61,6 +133,7 @@ const Create = () => {
                 setValidationerror('Please enter valid inputs.');
             }
             else {
+
                 setSubmitdisable('disabled');
                 axios.post(process.env.REACT_APP_SERVER_HOST + 'users', values, config)
                     .then(res => {
@@ -80,6 +153,8 @@ const Create = () => {
             }
         }
     }
+
+
     return (
         <div className="container d-flex vh-90 justify-content-center align-items-center">
             <div className="bg-white rounded p-3">
@@ -96,7 +171,6 @@ const Create = () => {
                                 <input type="text" className="form-control" placeholder='Enter User Name' onChange={e => setValues({ ...values, username: e.target.value })} required />
                                 <label htmlFor="username">Username</label>
                                 {error.username && <span className="text-danger">{error.username}</span>}
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Please fill out this field.</div>
                             </div>
                         </div>
@@ -105,7 +179,6 @@ const Create = () => {
                                 <input type="text" className="form-control" name="first_name" placeholder='Enter First Name' onChange={e => setValues({ ...values, first_name: e.target.value })} required />
                                 <label htmlFor="first_name">First Name</label>
                                 {error.first_name && <span className="text-danger">{error.first_name}</span>}
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Please fill out this field.</div>
 
                             </div>
@@ -115,7 +188,6 @@ const Create = () => {
                                 <input type="text" className="form-control" name="last_name" placeholder='Enter Last Name' onChange={e => setValues({ ...values, last_name: e.target.value })} required />
                                 <label htmlFor="last_name">Last Name</label>
                                 {error.last_name && <span className="text-danger">{error.last_name}</span>}
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Please fill out this field.</div>
                             </div>
                         </div>
@@ -124,7 +196,6 @@ const Create = () => {
                                 <input type="email" className="form-control" name="email" placeholder='Enter Email' onChange={e => setValues({ ...values, email: e.target.value })} required />
                                 <label htmlFor="email">Email</label>
                                 {error.email && <span className="text-danger">{error.email}</span>}
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Please fill out this field.</div>
                             </div>
                         </div>
@@ -133,7 +204,6 @@ const Create = () => {
                                 <input type="text" maxLength="10" className="form-control" name="mobile" pattern="[7-9]{1}[0-9]{9}" placeholder='Enter Mobile No.' onChange={e => setValues({ ...values, mobile: e.target.value })} required />
                                 <label htmlFor="mobile">Mobile No.</label>
                                 {error.mobile && <span className="text-danger">{error.mobile}</span>}
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Mobile no. is not valid.</div>
 
                             </div>
@@ -143,7 +213,6 @@ const Create = () => {
                                 <input type="text" maxLength="12" className="form-control" name="aadhar" pattern="[4-9]{1}[0-9]{11}" placeholder='Enter Aadhar Card No.' onChange={e => setValues({ ...values, aadhar: e.target.value })} required />
                                 <label htmlFor="aadhar">Aadhar Card No.</label>
                                 {error.aadhar && <span className="text-danger">{error.aadhar}</span>}
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Aadhar no. is not valid.</div>
 
                             </div>
@@ -178,27 +247,39 @@ const Create = () => {
                                 <input type="password" className="form-control" minLength={8} name="password" placeholder="Enter password" onChange={e => setValues({ ...values, password: e.target.value })} required />
                                 <label htmlFor="password">Password</label>
                                 {error.password && <span className="text-danger">{error.password}</span>}
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Password is invalid.</div>
 
                             </div>
                         </div>
                         <div className="col-md-6">
                             <div className="form-floating mb-2">
-                                <input type="number" className="form-control" name="subscription_days" min="1" placeholder='Enter no. of days' onChange={e => setValues({ ...values, subscription_days: e.target.value })} required />
-                                <label htmlFor="subscription_days">Subscription Days</label>
-                                <div className="valid-feedback">Valid.</div>
+                                {/* <input type="number"  min="1" placeholder='Enter no. of days' onChange={e => setValues({ ...values, subscription_days: e.target.value })} required /> */}
+                                <select className="form-control" name="subscription_days" onChange={setPackage}>
+                                    <option>Select Package</option>
+                                    {subscriptions.map((subscription, index) => {
+                                        return (
+                                            <option key={index} value={subscription.id}>{subscription.subscription_months} months</option>
+                                        )
+                                    })}
+                                </select>
+                                <label htmlFor="subscription_days">Subscription Packages</label>
                                 <div className="invalid-feedback">Please fill out this field.</div>
                             </div>
                         </div>
                         <div className="col-md-6">
                             <div className="form-floating mb-2">
-                                <input type="number" className="form-control" name="subscription_amount" placeholder='Enter no. of days' onChange={e => setValues({ ...values, subscription_amount: e.target.value })} required />
+                                <input type="number" className="form-control" min={1} max={100} name="subscription_discount" placeholder='Enter %' onChange={setDiscount} />
+                                <label htmlFor="subscription_discount">Subscription Discount<small className='text-muted'> (in %) (if Any)</small></label>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="form-floating mb-2">
+                                <input type="number" className="form-control" name="subscription_amount" value={subscriptionAmount} placeholder='Enter amount' required disabled />
                                 <label htmlFor="subscription_amount">Subscription Amount <small className='text-muted'>(In Rs.)</small></label>
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Please fill out this field.</div>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="form-floating mb-2">
                                 <select className='form-control' name='payment_mode' onChange={e => setValues({ ...values, payment_mode: e.target.value })} required>
@@ -210,16 +291,15 @@ const Create = () => {
                                     <option value='not-paid'>Not Paid</option>
                                 </select>
                                 <label htmlFor="payment_mode">Payment Mode</label>
-                                <div className="valid-feedback">Valid.</div>
                                 <div className="invalid-feedback">Please select payment mode.</div>
                             </div>
                         </div>
                     </div>
-                    
-                    {submitdisable ? ( <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+
+                    {submitdisable ? (<div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
                     </div>) : (<button className={'btn btn-success ' + submitdisable}>Submit</button>)}
-                   
+
                 </form>
 
             </div>

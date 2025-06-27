@@ -43,6 +43,7 @@ const UserRecord = () => {
     };
 
     useEffect(() => {
+        document.title = 'User Record';
         getuser();
     }, []);
     return (
@@ -91,11 +92,13 @@ const UserRecord = () => {
                     <label className="text-capitalize"><b>Payment Through : </b> <span className="text-uppercase">{user.payment_mode}</span></label>
                 </div>
                 <div className="col-md-4">
-                    <label className="text-capitalize"><b>Subscription End : </b> <span className="text-danger">{daysleft > 0 ? `- ${daysleft} Days Left` : 'End'} </span></label>
+                    {/* <label className="text-capitalize"><b>Subscription End : </b> <span className="text-danger">{daysleft > 0 ? `- ${daysleft} Days Left` : 'End'} </span></label> */}
+                    <label className="text-capitalize"><b>Subscription End Date : </b> <span className="text-danger">{new Date(user.subscription_end_date * 1000).toLocaleDateString()} </span></label>
                 </div>
             </div>
             <hr />
             <p className="font-weight-bold h4">Book Assignment Details</p>
+            <Link to="/book/assignments" className="btn btn-info float-right">Assignments</Link>
             <p className="text-info">Total Books : {assignment.length}</p>
             <p className="text-success">Return Books : {totalReturn}</p>
             <p className="text-danger">Pending For Return : {assignment.length - totalReturn}</p>
@@ -121,7 +124,7 @@ const UserRecord = () => {
                         <span><b>Issue Till Date : </b> {new Date(assignment.to_date).toLocaleDateString()}</span>
                     </div>
                     <div className="col-md-4">
-                        <span><b>Return Status : </b> {assignment.return ? (<span className="text-success pe-none">Returned</span>) : (<span className="btn btn-warning pe-none">Pending</span>)}</span>
+                        <span><b>Return Status : </b> {assignment.return ? (<span className="text-success pe-none">Returned</span>) : (<span className="text-warning pe-none">Pending</span>)}</span>
                     </div>
                     <div className="col-md-4">
                         <span><b>Return Date : </b> {assignment.return_date ? new Date(assignment.return_date * 1000).toLocaleDateString() : 'Not Available'}</span>

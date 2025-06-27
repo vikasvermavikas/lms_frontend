@@ -22,7 +22,6 @@ const Qrsearch = (props) => {
                 className=''
                 onResult={afterscan}
             />
-            {/* <p>{data}</p> */}
         </div>
     )
 };
